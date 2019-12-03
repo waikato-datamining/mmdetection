@@ -34,7 +34,7 @@ Sat Nov 30 04:28:00 2019 +1300
 * Convert annotations (in ADAMS report format) to MS COCO JSON format (See https://github.com/waikato-datamining/mscocodata). 
   Conversion must be done twice, once for training set and again for validation set.
   
-* Store class names or label strings in an environment variable called "CLASSES":
+* Store class names or label strings in an environment variable called "CLASSES" **(inside the container)**:
 
   ```commandline
   export CLASSES=\'class1\',\'class2\',...
