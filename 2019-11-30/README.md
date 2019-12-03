@@ -40,7 +40,24 @@ Sat Nov 30 04:28:00 2019 +1300
   export CLASSES=\'class1\',\'class2\',...
   ```
 
-* Copy the config file (of the model you want to train) from /mmdetection/configs to local disk and make the following changes:
+* Copy the config file (of the model you want to train) from /mmdetection/configs (inside the container) or from [here](https://github.com/open-mmlab/mmdetection/tree/b7894cbdcbe114e3e9efdd1a6a229419a552c807/configs) to local disk, then follow [these instructions](#config).
+
+* Train
+
+  ```commandline
+  mmdet_train /path_to/your_data_config.py --autoscale-lr
+  ```
+
+* Predict and produce csv files
+
+  ```commandline
+  mmdet_predict --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
+    --prediction_in /path_to/test_imgs/ --prediction_out /path_to/test_results/ \
+    --labels /path_to/your_data/labels.txt --score 0 --num_imgs 3 --output_inference_time
+  ```
+  Run with -h for all available options.
+  
+#### <a name="config">Preparing the config file</a>
 
 1. Change num_classes to labels + 1 (BG).
 2. In train_cfg & test_cfg: change nms_pre, nms_post, & max_num to the preferred values.
@@ -57,21 +74,6 @@ Sat Nov 30 04:28:00 2019 +1300
 13. Add , ('val', 1) to workflow.
 
 _You don't have to copy the config file back, just point at it when training._
-
-* Train
-
-  ```commandline
-  mmdet_train /path_to/your_data_config.py --autoscale-lr
-  ```
-
-* Predict and produce csv files
-
-  ```commandline
-  mmdet_predict --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
-    --prediction_in /path_to/test_imgs/ --prediction_out /path_to/test_results/ \
-    --labels /path_to/your_data/labels.txt --score 0 --num_imgs 3 --output_inference_time
-  ```
-  Run with -h for all available options.
 
 ## Docker Image in aml-repo
 
