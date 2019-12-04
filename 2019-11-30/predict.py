@@ -15,6 +15,7 @@ from datetime import datetime
 import time
 
 import mmcv
+from skimage import measure
 import pycocotools.mask as maskUtils
 from mmdet.apis import init_detector, inference_detector
 
@@ -143,19 +144,6 @@ def predict_on_images(input_dir, model, output_dir, class_names, score_threshold
                         enumerate(bbox_result)]
         labels = np.concatenate(labels)
 
-        # if segm_result is not None:
-            # segms = mmcv.concat_list(segm_result)
-            # inds = np.where(bboxes[:, -1] > score_threshold)[0]
-            # color_index = list(set(labels))
-            # color_mask = []
-            # for i in color_index:
-                # color_mask.append(np.random.randint(0, 256, (1, 3), dtype=np.uint8))
-            # for i in inds:
-                # mask = maskUtils.decode(segms[i]).astype(np.bool)
-                # image_array[mask] = image_array[mask] * 0.5 + color_mask[labels[i]] * 0.5
-            # masked_image = Image.fromarray(image_array, 'RGB')
-            # masked_image.save("{}/masked_{}.png".format(output_dir, os.path.splitext(os.path.basename(im_name))[0]), 'png')
-
         if OUTPUT_COMBINED:
             roi_path = "{}/{}-rois-combined.csv".format(output_dir, os.path.splitext(os.path.basename(im_name))[0])
             with open(roi_path, "w") as roi_file:
@@ -183,28 +171,33 @@ def predict_on_images(input_dir, model, output_dir, class_names, score_threshold
                     roi_file.write(
                         "{},{},{},{},{},{},{},{},{},{},{},{}".format(os.path.basename(im_name), x0, y0, x1, y1,
                                                                        x0n, y0n, x1n, y1n, label, label_str, score))
-                    
+
                     if segm_result is not None:
-                        if isinstance(segm_result, tuple):
-                            mask = segm_result[0][index]
-                            mask_score = segm_result[1][index]
+                        segms = mmcv.concat_list(segm_result)
+                        if isinstance(segms, tuple):
+                            mask = segms[0][index]
+                            mask_score = segms[1][index]
                         else:
-                            mask = segm_result[index]
+                            mask = segms[index]
                             mask_score = score
-                        if isinstance(mask['counts'], bytes):
-                            mask['counts'] = mask['counts'].decode()
-                        poly_x = []
-                        poly_xn = []
-                        poly_y = []
-                        poly_yn = []
-                        for c in range(len(mask)):
-                            if c % 2 == 0:
-                                poly_x.append(mask[c])
-                                poly_xn.append(mask[c] / image.width)
-                            else:
-                                poly_y.append(mask[c])
-                                poly_yn.append(mask[c] / image.height)
-                        roi_file.write(",{},{},{},{},{}\n".format(poly_x, poly_y, poly_xn, poly_yn, mask_score))
+                        mask = maskUtils.decode(mask).astype(np.int)
+                        mask = measure.find_contours(mask, 0.5)
+                        if mask:
+                            roi_file.write(",\"")
+                            for c in mask[0]:
+                                roi_file.write("{},".format(c[1]))
+                            roi_file.write("\",\"")
+                            for c in mask[0]:
+                                roi_file.write("{},".format(c[0]))
+                            roi_file.write("\",\"")
+                            for c in mask[0]:
+                                roi_file.write("{},".format(c[1] / image.width))
+                            roi_file.write("\",\"")
+                            for c in mask[0]:
+                                roi_file.write("{},".format(c[0] / image.height))
+                            roi_file.write("\",{}\n".format(mask_score))
+                        else:
+                            roi_file.write("\n")
                     else:
                         roi_file.write("\n")
 
@@ -236,46 +229,49 @@ def predict_on_images(input_dir, model, output_dir, class_names, score_threshold
                     if score < score_threshold:
                         continue
 
-                    # Translate roi coordinates into image coordinates
-                    x0n = x0 / image.width
-                    y0n = y0 / image.height
-                    x1n = x1 / image.width
-                    y1n = y1 / image.height
-
                     if y0 > max_height or y1 > max_height:
                         continue
                     elif y0 < min_height or y1 < min_height:
                         continue
 
+                    # Translate roi coordinates into original image coordinates (before combining)
+                    y0 -= min_height
+                    y1 -= min_height
+                    x0n = x0 / img.width
+                    y0n = y0 / img.height
+                    x1n = x1 / img.width
+                    y1n = y1 / img.height
+
                     # output
-                    roi_file.write("{},{},{},{},{},{},{},{},{},{},{},{}".format(os.path.basename(im_name),
+                    roi_file.write("{},{},{},{},{},{},{},{},{},{},{},{}".format(os.path.basename(im_list[i]),
                                                                                   x0, y0, x1, y1, x0n, y0n, x1n, y1n,
                                                                                   label, label_str, score))
                     if segm_result is not None:
+                        segms = mmcv.concat_list(segm_result)
                         if isinstance(segms, tuple):
                             mask = segms[0][index]
                             mask_score = segms[1][index]
                         else:
                             mask = segms[index]
                             mask_score = score
-                        poly_x = []
-                        poly_xn = []
-                        poly_y = []
-                        poly_yn = []
-                        if isinstance(mask[index]['counts'], bytes):
-                            print("mask counts are bytes")
-                            #mask[index]['counts'] = mask[index]['counts'].decode()
-                            mask = maskUtils.decode(mask).astype(np.bool)
-                        print(mask)
-                        quit()
-                        for c in range(len(mask[index])):
-                            if c % 2 == 0:
-                                poly_x.append(mask[c])
-                                poly_xn.append(mask[c] / image.width)
-                            else:
-                                poly_y.append(mask[c])
-                                poly_yn.append(mask[c] / image.height)
-                        roi_file.write(",{},{},{},{},{}\n".format(poly_x, poly_y, poly_xn, poly_yn, mask_score))
+                        mask = maskUtils.decode(mask).astype(np.int)
+                        mask = measure.find_contours(mask, 0.5)
+                        if mask:
+                            roi_file.write(",\"")
+                            for c in mask[0]:
+                                roi_file.write("{},".format(c[1]))
+                            roi_file.write("\",\"")
+                            for c in mask[0]:
+                                roi_file.write("{},".format(c[0]-min_height))
+                            roi_file.write("\",\"")
+                            for c in mask[0]:
+                                roi_file.write("{},".format(c[1] / img.width))
+                            roi_file.write("\",\"")
+                            for c in mask[0]:
+                                roi_file.write("{},".format((c[0]-min_height) / img.height))
+                            roi_file.write("\",{}\n".format(mask_score))
+                        else:
+                            roi_file.write("\n")
                     else:
                         roi_file.write("\n")
             os.rename(roi_path_tmp, roi_path)
