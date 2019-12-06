@@ -181,7 +181,7 @@ def predict_on_images(input_dir, model, output_dir, class_names, score_threshold
                             mask = segms[index]
                             mask_score = score
                         mask = maskUtils.decode(mask).astype(np.int)
-                        mask = measure.find_contours(mask, 0.5)
+                        mask = measure.find_contours(mask, 0.1)
                         if mask:
                             roi_file.write(",\"")
                             for c in mask[0]:
@@ -255,7 +255,7 @@ def predict_on_images(input_dir, model, output_dir, class_names, score_threshold
                             mask = segms[index]
                             mask_score = score
                         mask = maskUtils.decode(mask).astype(np.int)
-                        mask = measure.find_contours(mask, 0.5)
+                        mask = measure.find_contours(mask, 0.1)
                         if mask:
                             roi_file.write(",\"")
                             for c in mask[0]:
