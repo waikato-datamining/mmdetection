@@ -106,3 +106,7 @@ venv.bak/
 # idea settings
 .idea/
 *.iml
+*~
+*.swp
+*.bak
+
