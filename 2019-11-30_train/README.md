@@ -2,7 +2,7 @@
 
 Allows processing of images with MMDetection.
 
-# Version
+## Version
 
 MMDetection github repo hash:
 
@@ -16,23 +16,26 @@ and timestamp:
 Sat Nov 30 04:28:00 2019 +1300
 ```
 
-## Installation & Usage on Linux with Docker
+## Docker
+
+### Build local image
 
 * Build the image from Docker file (from within /path_to/mmdetection/2019-11-30_train)
 
   ```commandline
-  sudo docker build -t mmdet .
+  sudo docker build -t mmdet_train .
   ```
   
 * Run the container
 
   ```commandline
   sudo docker run --runtime=nvidia --shm-size 8G -v /local:/container -it \
-    -e CLASSES=\'class1\',\'class2\',... mmdet /path_to/your_data_config.py --autoscale-lr
+    -e CLASSES=\'class1\',\'class2\',... mmdet_train /path_to/your_data_config.py --autoscale-lr
   ```
   "/local:/container" maps a local disk directory into a directory inside the container
 
-## Docker Image in aml-repo
+
+### Pre-built images
 
 * Build
 
@@ -87,3 +90,4 @@ Sat Nov 30 04:28:00 2019 +1300
     /path_to/your_data_config.py --autoscale-lr
   ```
   "/local:/container" maps a local disk directory into a directory inside the container
+
