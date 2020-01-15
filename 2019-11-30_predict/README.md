@@ -37,7 +37,7 @@ Sat Nov 30 04:28:00 2019 +1300
   ```
   "/local:/container" maps a local disk directory into a directory inside the container
 
-### Pre-build images
+### Pre-built images
 
 * Build
 
