@@ -2,7 +2,7 @@
 
 Allows processing of images with MMDetection.
 
-# Version
+## Version
 
 MMDetection github repo hash:
 
@@ -16,7 +16,9 @@ and timestamp:
 Sat Nov 30 04:28:00 2019 +1300
 ```
 
-## Installation & Usage on Linux with Docker
+## Docker
+
+### Build local image
 
 * Build the image from Docker file (from within /path_to/mmdetection/2019-11-30)
 
@@ -31,7 +33,9 @@ Sat Nov 30 04:28:00 2019 +1300
   ```
   "/local:/container" maps a local disk directory into a directory inside the container
 
-* Convert annotations (in ADAMS report format) to MS COCO JSON format (See https://github.com/waikato-datamining/mscocodata). 
+### Usage
+
+* Convert annotations (in ADAMS report format) to MS COCO JSON format using [wai.annotations](https://github.com/waikato-ufdl/wai-annotations). 
   Conversion must be done twice, once for training set and again for validation set.
   
 * Store class names or label strings in an environment variable called "CLASSES" **(inside the container)**:
@@ -56,26 +60,8 @@ Sat Nov 30 04:28:00 2019 +1300
     --labels /path_to/your_data/labels.txt --score 0 --num_imgs 3 --output_inference_time
   ```
   Run with -h for all available options.
-  
-#### <a name="config">Preparing the config file</a>
 
-1. Change num_classes to labels + 1 (BG).
-2. In train_cfg & test_cfg: change nms_pre, nms_post, & max_num to the preferred values.
-3. Change dataset_type to 'Dataset'
-4. Change data_root to the root path of your dataset (the directory containing train & val directories).
-5. Copy & paste train_pipeline = [...] and change it to val_pipeline.
-6. In train_pipeline, val_pipeline, & test_pipeline: change img_scale to preferred values. Image will be scaled to the smaller value between (larger_scale/larger_image_side) & (smaller_scale/smaller_image_side).
-7. Change ann_file (after data_root +) to train/annotations.json (train) or val/annotations.json (val & test).
-8. Change img_prefix (after data_root +) to train/ (train) or val/ (val & test).
-9. Change pipeline for val to val_pipeline.
-10. Interval in checkpoint_config will determine the frequency of saving models while training (10 for example will save a model after every 10 epochs).
-11. Change total_epochs to how many epochs you want to train the model for.
-12. Change work_dir to the path where you want to save the trained models to.
-13. Add , ('val', 1) to workflow.
-
-_You don't have to copy the config file back, just point at it when training._
-
-## Docker Image in aml-repo
+## Pre-built images
 
 * Build
 
@@ -128,3 +114,22 @@ _You don't have to copy the config file back, just point at it when training._
   docker run --runtime=nvidia --shm-size 8G -v /local:/container -it mmdetection:2019-11-30
   ```
   "/local:/container" maps a local disk directory into a directory inside the container
+
+  
+## <a name="config">Preparing the config file</a>
+
+1. Change num_classes to labels + 1 (BG).
+2. In train_cfg & test_cfg: change nms_pre, nms_post, & max_num to the preferred values.
+3. Change dataset_type to 'Dataset'
+4. Change data_root to the root path of your dataset (the directory containing train & val directories).
+5. Copy & paste train_pipeline = [...] and change it to val_pipeline.
+6. In train_pipeline, val_pipeline, & test_pipeline: change img_scale to preferred values. Image will be scaled to the smaller value between (larger_scale/larger_image_side) & (smaller_scale/smaller_image_side).
+7. Change ann_file (after data_root +) to train/annotations.json (train) or val/annotations.json (val & test).
+8. Change img_prefix (after data_root +) to train/ (train) or val/ (val & test).
+9. Change pipeline for val to val_pipeline.
+10. Interval in checkpoint_config will determine the frequency of saving models while training (10 for example will save a model after every 10 epochs).
+11. Change total_epochs to how many epochs you want to train the model for.
+12. Change work_dir to the path where you want to save the trained models to.
+13. Add , ('val', 1) to workflow.
+
+_You don't have to copy the config file back, just point at it when training._
