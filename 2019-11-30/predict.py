@@ -55,7 +55,7 @@ def remove_alpha_channel(image):
         return image
 
 
-def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold, num_imgs, inference_times, delete_input, mask_threshold):
+def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold, num_imgs, inference_times, delete_input, mask_threshold, mask_nth):
     """
     Method performing predictions on all images ony by one or combined as specified by the int value of num_imgs.
 
@@ -78,6 +78,8 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :type delete_input: bool
     :param mask_threshold: the threshold to use for determining the contour of a mask
     :type mask_threshold: float
+    :param mask_nth: to speed up polygon computation, use only every nth row and column from mask
+    :type mask_nth: int
     """
 
     # Iterate through all files present in "input_dir"
@@ -185,19 +187,25 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                             mask = segms[index]
                             mask_score = score
                         mask = maskUtils.decode(mask).astype(np.int)
-                        mask = measure.find_contours(mask, mask_threshold)
-                        if mask:
+                        if mask_nth > 1:
+                            rows = np.array(range(0, mask.shape[0], mask_nth))
+                            cols = np.array(range(0, mask.shape[1], mask_nth))
+                            mask_small = mask[np.ix_(rows, cols)]
+                        else:
+                            mask_small = mask
+                        poly = measure.find_contours(mask_small, mask_threshold)
+                        if len(poly) > 0:                       
                             roi_file.write(",\"")
-                            for c in mask[0]:
+                            for c in poly[0]:
                                 roi_file.write("{},".format(c[1]))
                             roi_file.write("\",\"")
-                            for c in mask[0]:
+                            for c in poly[0]:
                                 roi_file.write("{},".format(c[0]))
                             roi_file.write("\",\"")
-                            for c in mask[0]:
+                            for c in poly[0]:
                                 roi_file.write("{},".format(c[1] / image.width))
                             roi_file.write("\",\"")
-                            for c in mask[0]:
+                            for c in poly[0]:
                                 roi_file.write("{},".format(c[0] / image.height))
                             roi_file.write("\",{}\n".format(mask_score))
                         else:
@@ -262,19 +270,25 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                             mask = segms[index]
                             mask_score = score
                         mask = maskUtils.decode(mask).astype(np.int)
-                        mask = measure.find_contours(mask, 0.1)
-                        if mask:
+                        if mask_nth > 1:
+                            rows = np.array(range(0, mask.shape[0], mask_nth))
+                            cols = np.array(range(0, mask.shape[1], mask_nth))
+                            mask_small = mask[np.ix_(rows, cols)]
+                        else:
+                            mask_small = mask
+                        poly = measure.find_contours(mask_small, mask_threshold)
+                        if len(poly) > 0:                       
                             roi_file.write(",\"")
-                            for c in mask[0]:
+                            for c in poly[0]:
                                 roi_file.write("{},".format(c[1]))
                             roi_file.write("\",\"")
-                            for c in mask[0]:
+                            for c in poly[0]:
                                 roi_file.write("{},".format(c[0]-min_height))
                             roi_file.write("\",\"")
-                            for c in mask[0]:
+                            for c in poly[0]:
                                 roi_file.write("{},".format(c[1] / img.width))
                             roi_file.write("\",\"")
-                            for c in mask[0]:
+                            for c in poly[0]:
                                 roi_file.write("{},".format((c[0]-min_height) / img.height))
                             roi_file.write("\",{}\n".format(mask_score))
                         else:
@@ -321,6 +335,7 @@ if __name__ == '__main__':
     parser.add_argument('--labels', help='Path to text file with comma seperated labels', required=True, default=None)
     parser.add_argument('--score', type=float, help='Score threshold to include in csv file', required=False, default=0.0)
     parser.add_argument('--mask_threshold', type=float, help='The threshold (0-1) to use for determining the contour of a mask', required=False, default=0.1)
+    parser.add_argument('--mask_nth', type=int, help='To speed polygon detection up, use every nth row and column only', required=False, default=1)
     parser.add_argument('--num_imgs', type=int, help='Number of images to combine', required=False, default=1)
     parser.add_argument('--status', help='file path for predict exit status file', required=False, default=None)
     parser.add_argument('--continuous', action='store_true', help='Whether to continuously load test images and perform prediction', required=False, default=False)
@@ -341,7 +356,7 @@ if __name__ == '__main__':
             # Performing the prediction and producing the csv files
             predict_on_images(parsed.prediction_in, model, parsed.prediction_out, parsed.prediction_tmp, class_names,
                                             parsed.score, parsed.num_imgs, parsed.output_inference_time,
-                                            parsed.delete_input, parsed.mask_threshold)
+                                            parsed.delete_input, parsed.mask_threshold, parsed.mask_nth)
 
             # Exit if not continuous
             if not parsed.continuous:

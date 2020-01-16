@@ -52,7 +52,7 @@ Sat Nov 30 04:28:00 2019 +1300
   mmdet_train /path_to/your_data_config.py --autoscale-lr
   ```
 
-* Predict and produce csv files
+* Predict and produce CSV files
 
   ```commandline
   mmdet_predict --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
@@ -60,6 +60,11 @@ Sat Nov 30 04:28:00 2019 +1300
     --labels /path_to/your_data/labels.txt --score 0 --num_imgs 3 --output_inference_time
   ```
   Run with -h for all available options.
+
+  You may also need to specify the following options:
+
+  * `--mask_threshold` - if using another threshold than the default of 0.1
+  * `--mask_nth` - use every nth row/col of mask to speed up computation of polygon
 
 ## Pre-built images
 
