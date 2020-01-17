@@ -65,6 +65,7 @@ Sat Nov 30 04:28:00 2019 +1300
 
   * `--mask_threshold` - if using another threshold than the default of 0.1
   * `--mask_nth` - use every nth row/col of mask to speed up computation of polygon
+  * `--output_minrect`
 
 ## Pre-built images
 

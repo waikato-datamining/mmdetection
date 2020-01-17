@@ -13,6 +13,7 @@ import argparse
 from PIL import Image
 from datetime import datetime
 import time
+import cv2
 
 import mmcv
 from skimage import measure
@@ -55,7 +56,9 @@ def remove_alpha_channel(image):
         return image
 
 
-def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold, num_imgs, inference_times, delete_input, mask_threshold, mask_nth):
+def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold, 
+                      num_imgs, inference_times, delete_input, mask_threshold, mask_nth, 
+                      output_minrect):
     """
     Method performing predictions on all images ony by one or combined as specified by the int value of num_imgs.
 
@@ -80,6 +83,8 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :type mask_threshold: float
     :param mask_nth: to speed up polygon computation, use only every nth row and column from mask
     :type mask_nth: int
+    :param output_minrect: when predicting polygons, whether to output the minimal rectangles around the objects as well
+    :type output_minrect: bool
     """
 
     # Iterate through all files present in "input_dir"
@@ -156,7 +161,9 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                 # File header
                 roi_file.write("file,x0,y0,x1,y1,x0n,y0n,x1n,y1n,label,label_str,score")
                 if segm_result is not None:
-                    roi_file.write(",poly_x,poly_y,poly_xn,poly_yn,mask_score\n")
+                    roi_file.write(",poly_x,poly_y,poly_xn,poly_yn,mask_score")
+                    if output_minrect:
+                        roi_file.write(",minrect_w,minrect_h")
                 else:
                     roi_file.write("\n")
                 for index in range(len(bboxes)):
@@ -207,9 +214,19 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                             roi_file.write("\",\"")
                             for c in poly[0]:
                                 roi_file.write("{},".format(c[0] / image.height))
-                            roi_file.write("\",{}\n".format(mask_score))
-                        else:
+                            roi_file.write("\",{}".format(mask_score))
+
+                            if output_minrect:
+                                rect = cv2.minAreaRect(np.float32(poly[0]))
+                                bw = rect[1][0] * mask_nth
+                                bh = rect[1][1] * mask_nth
+                                roi_file.write("{},{},".format(bw, bh))
+
                             roi_file.write("\n")
+                        else:
+                            if output_minrect:
+                              roi_file.write(",,")
+                            roi_file.write(",,,,\n")
                     else:
                         roi_file.write("\n")
 
@@ -231,7 +248,9 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                 # File header
                 roi_file.write("file,x0,y0,x1,y1,x0n,y0n,x1n,y1n,label,label_str,score")
                 if segm_result is not None:
-                    roi_file.write(",poly_x,poly_y,poly_xn,poly_yn,mask_score\n")
+                    roi_file.write(",poly_x,poly_y,poly_xn,poly_yn,mask_score")
+                    if output_minrect:
+                        roi_file.write(",minrect_w,minrect_h")
                 else:
                     roi_file.write("\n")
                 # rois
@@ -290,9 +309,19 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                             roi_file.write("\",\"")
                             for c in poly[0]:
                                 roi_file.write("{},".format((c[0]-min_height) / img.height))
-                            roi_file.write("\",{}\n".format(mask_score))
-                        else:
+                            roi_file.write("\",{}".format(mask_score))
+
+                            if output_minrect:
+                                rect = cv2.minAreaRect(np.float32(poly[0]))
+                                bw = rect[1][0] * mask_nth
+                                bh = rect[1][1] * mask_nth
+                                roi_file.write("{},{},".format(bw, bh))
+
                             roi_file.write("\n")
+                        else:
+                            if output_minrect:
+                              roi_file.write(",,")
+                            roi_file.write(",,,,\n")
                     else:
                         roi_file.write("\n")
             os.rename(roi_path_tmp, roi_path)
@@ -336,6 +365,7 @@ if __name__ == '__main__':
     parser.add_argument('--score', type=float, help='Score threshold to include in csv file', required=False, default=0.0)
     parser.add_argument('--mask_threshold', type=float, help='The threshold (0-1) to use for determining the contour of a mask', required=False, default=0.1)
     parser.add_argument('--mask_nth', type=int, help='To speed polygon detection up, use every nth row and column only', required=False, default=1)
+    parser.add_argument('--output_minrect', action='store_true', help='When outputting polygons whether to store the minimal rectangle around the objects in the CSV files as well', required=False, default=False)
     parser.add_argument('--num_imgs', type=int, help='Number of images to combine', required=False, default=1)
     parser.add_argument('--status', help='file path for predict exit status file', required=False, default=None)
     parser.add_argument('--continuous', action='store_true', help='Whether to continuously load test images and perform prediction', required=False, default=False)
@@ -356,7 +386,8 @@ if __name__ == '__main__':
             # Performing the prediction and producing the csv files
             predict_on_images(parsed.prediction_in, model, parsed.prediction_out, parsed.prediction_tmp, class_names,
                                             parsed.score, parsed.num_imgs, parsed.output_inference_time,
-                                            parsed.delete_input, parsed.mask_threshold, parsed.mask_nth)
+                                            parsed.delete_input, parsed.mask_threshold, parsed.mask_nth,
+                                            parsed.output_minrect)
 
             # Exit if not continuous
             if not parsed.continuous:
