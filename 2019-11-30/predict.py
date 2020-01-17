@@ -23,6 +23,9 @@ from mmdet.apis import init_detector, inference_detector
 OUTPUT_COMBINED = False
 """ Whether to output CSV file with ROIs for combined images as well (only for debugging). """
 
+SUPPORTED_EXTS = [".jpg", ".jpeg", ".png", ".bmp"]
+""" supported file extensions (lower case). """
+
 
 def load_image_into_numpy_array(image):
     """
@@ -96,10 +99,13 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
         im_list = []
         # Loop to pick up images equal to num_imgs or the remaining images if less
         for image_path in os.listdir(input_dir):
-            # Load images only, currently supporting only jpg and png
-            # TODO image complete?
-            if image_path.lower().endswith(".jpg") or image_path.lower().endswith(".png"):
-                im_list.append(os.path.join(input_dir, image_path))
+            # Load images only
+            ext_lower = os.path.splitext(image_path)[1]
+            # TODO add to blacklist if tried several times
+            if ext_lower in SUPPORTED_EXTS:
+                full_path = os.path.join(input_dir, image_path)
+                if auto.is_image_complete(full_path):
+                    im_list.append(full_path)
             if len(im_list) == num_imgs:
                 break
 
