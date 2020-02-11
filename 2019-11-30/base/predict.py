@@ -20,6 +20,7 @@ import mmcv
 from skimage import measure
 import pycocotools.mask as maskUtils
 from mmdet.apis import init_detector, inference_detector
+from wai.annotations.image_utils import image_to_numpyarray, remove_alpha_channel, mask_to_polygon, polygon_to_minrect, polygon_to_lists
 
 OUTPUT_COMBINED = False
 """ Whether to output CSV file with ROIs for combined images as well (only for debugging). """
@@ -29,38 +30,6 @@ SUPPORTED_EXTS = [".jpg", ".jpeg", ".png", ".bmp"]
 
 MAX_INCOMPLETE = 3
 """ the maximum number of times an image can return 'incomplete' status before getting moved/deleted. """
-
-
-def load_image_into_numpy_array(image):
-    """
-    Method to convert the image into a numpy array.
-    faster solution via np.fromstring found here:
-    https://stackoverflow.com/a/42036542/4698227
-
-    :param image: the image object to convert
-    :type image: Image
-    :return: the numpy array
-    :rtype: nd.array
-    """
-
-    im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
-    im_arr = im_arr.reshape((image.size[1], image.size[0], 3))
-    return im_arr
-
-
-def remove_alpha_channel(image):
-    """
-    Converts the Image object to RGB.
-
-    :param image: the image object to convert if necessary
-    :type image: Image
-    :return: the converted object
-    :rtype: Image
-    """
-    if image.mode is 'RGBA' or 'ARGB':
-        return image.convert('RGB')
-    else:
-        return image
 
 
 def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold, 
@@ -181,7 +150,7 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                 im_name = combined[0]
                 image = remove_alpha_channel(comb_img)
 
-            image_array = load_image_into_numpy_array(image)
+            image_array = image_to_numpyarray(image)
             result = inference_detector(model, image_array)
             
             assert isinstance(class_names, (tuple, list))
@@ -256,9 +225,7 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                                 roi_file.write("\",{}".format(mask_score))
 
                                 if output_minrect:
-                                    rect = cv2.minAreaRect(np.float32(poly[0]))
-                                    bw = rect[1][0] * mask_nth
-                                    bh = rect[1][1] * mask_nth
+                                    bw, bh = polygon_to_minrect(poly[0])
                                     roi_file.write("{},{},".format(bw, bh))
 
                                 roi_file.write("\n")
