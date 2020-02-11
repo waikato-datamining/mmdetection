@@ -72,7 +72,7 @@ Sat Nov 30 04:28:00 2019 +1300
 * Build
 
   ```commandline
-  docker build -t mmdetection/mmdetection:2019-11-30 .
+  docker build -t open-mmlab/mmdetection:2019-11-30 .
   ```
   
 * Tag
@@ -80,13 +80,13 @@ Sat Nov 30 04:28:00 2019 +1300
   ```commandline
   docker tag \
     mmdetection:2019-11-30 \
-    public-push.aml-repo.cms.waikato.ac.nz:443/mmdetection/mmdetection:2019-11-30
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30
   ```
   
 * Push
 
   ```commandline
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/mmdetection/mmdetection:2019-11-30
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -99,7 +99,7 @@ Sat Nov 30 04:28:00 2019 +1300
   If image is available in aml-repo and you just want to use it, you can pull using following command and then [run](#run).
 
   ```commandline
-  docker pull public.aml-repo.cms.waikato.ac.nz:443/mmdetection/mmdetection:2019-11-30
+  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -110,14 +110,14 @@ Sat Nov 30 04:28:00 2019 +1300
   
   ```commandline
   docker tag \
-    public.aml-repo.cms.waikato.ac.nz:443/mmdetection/mmdetection:2019-11-30 \
-    mmdetection/mmdetection:2019-11-30
+    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30 \
+    open-mmlab/mmdetection:2019-11-30
   ```
   
 * <a name="run">Run</a>
 
   ```commandline
-  docker run --runtime=nvidia --shm-size 8G -v /local:/container -it mmdetection/mmdetection:2019-11-30
+  docker run --runtime=nvidia --shm-size 8G -v /local:/container -it open-mmlab/mmdetection:2019-11-30
   ```
   "/local:/container" maps a local disk directory into a directory inside the container
 
