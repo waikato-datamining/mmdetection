@@ -2,7 +2,8 @@ ARG PYTORCH="1.3"
 ARG CUDA="10.1"
 ARG CUDNN="7"
 
-FROM pytorch/pytorch:${PYTORCH}-cuda${CUDA}-cudnn${CUDNN}-devel
+ARG DOCKER_REGISTRY=public.aml-repo.cms.waikato.ac.nz:443/
+FROM ${DOCKER_REGISTRY}pytorch/pytorch:${PYTORCH}-cuda${CUDA}-cudnn${CUDNN}-devel
 
 ENV TORCH_CUDA_ARCH_LIST="6.0 6.1 7.0+PTX"
 ENV TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
