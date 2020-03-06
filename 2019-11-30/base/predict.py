@@ -13,17 +13,16 @@ import argparse
 from PIL import Image
 from datetime import datetime
 import time
-import cv2
 from image_complete import auto
+import traceback
 
 import mmcv
-from skimage import measure
 import pycocotools.mask as maskUtils
 from mmdet.apis import init_detector, inference_detector
 from wai.annotations.image_utils import image_to_numpyarray, remove_alpha_channel, mask_to_polygon, polygon_to_minrect, polygon_to_lists
-
-OUTPUT_COMBINED = False
-""" Whether to output CSV file with ROIs for combined images as well (only for debugging). """
+from wai.annotations.core import ImageInfo
+from wai.annotations.roi import ROIObject
+from wai.annotations.roi.io import ROIWriter
 
 SUPPORTED_EXTS = [".jpg", ".jpeg", ".png", ".bmp"]
 """ supported file extensions (lower case). """
@@ -163,79 +162,6 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                             enumerate(bbox_result)]
             labels = np.concatenate(labels)
 
-            if OUTPUT_COMBINED:
-                roi_path = "{}/{}-rois-combined.csv".format(output_dir, os.path.splitext(os.path.basename(im_name))[0])
-                with open(roi_path, "w") as roi_file:
-                    # File header
-                    roi_file.write("file,x0,y0,x1,y1,x0n,y0n,x1n,y1n,label,label_str,score")
-                    if segm_result is not None:
-                        roi_file.write(",poly_x,poly_y,poly_xn,poly_yn,mask_score")
-                        if output_minrect:
-                            roi_file.write(",minrect_w,minrect_h")
-                    else:
-                        roi_file.write("\n")
-                    for index in range(len(bboxes)):
-                        x0, y0, x1, y1, score = bboxes[index]
-                        label = labels[index]
-                        label_str = class_names[label - 1]
-
-                        # Ignore this roi if the score is less than the provided threshold
-                        if score < score_threshold:
-                            continue
-
-                        # Translate roi coordinates into image coordinates
-                        x0n = x0 / image.width
-                        y0n = y0 / image.height
-                        x1n = x1 / image.width
-                        y1n = y1 / image.height
-
-                        roi_file.write(
-                            "{},{},{},{},{},{},{},{},{},{},{},{}".format(os.path.basename(im_name), x0, y0, x1, y1,
-                                                                           x0n, y0n, x1n, y1n, label, label_str, score))
-
-                        if segm_result is not None:
-                            segms = mmcv.concat_list(segm_result)
-                            if isinstance(segms, tuple):
-                                mask = segms[0][index]
-                                mask_score = segms[1][index]
-                            else:
-                                mask = segms[index]
-                                mask_score = score
-                            mask = maskUtils.decode(mask).astype(np.int)
-                            if mask_nth > 1:
-                                rows = np.array(range(0, mask.shape[0], mask_nth))
-                                cols = np.array(range(0, mask.shape[1], mask_nth))
-                                mask_small = mask[np.ix_(rows, cols)]
-                            else:
-                                mask_small = mask
-                            poly = measure.find_contours(mask_small, mask_threshold)
-                            if len(poly) > 0:                       
-                                roi_file.write(",\"")
-                                for c in poly[0]:
-                                    roi_file.write("{},".format(c[1]))
-                                roi_file.write("\",\"")
-                                for c in poly[0]:
-                                    roi_file.write("{},".format(c[0]))
-                                roi_file.write("\",\"")
-                                for c in poly[0]:
-                                    roi_file.write("{},".format(c[1] / image.width))
-                                roi_file.write("\",\"")
-                                for c in poly[0]:
-                                    roi_file.write("{},".format(c[0] / image.height))
-                                roi_file.write("\",{}".format(mask_score))
-
-                                if output_minrect:
-                                    bw, bh = polygon_to_minrect(poly[0])
-                                    roi_file.write("{},{},".format(bw, bh))
-
-                                roi_file.write("\n")
-                            else:
-                                if output_minrect:
-                                  roi_file.write(",,")
-                                roi_file.write(",,,,\n")
-                        else:
-                            roi_file.write("\n")
-
             # Code for splitting rois to multiple csv's, one csv per image before combining
             max_height = 0
             prev_min = 0
@@ -250,87 +176,70 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                     roi_path_tmp = "{}/{}-rois.tmp".format(tmp_dir, os.path.splitext(os.path.basename(im_list[i]))[0])
                 else:
                     roi_path_tmp = "{}/{}-rois.tmp".format(output_dir, os.path.splitext(os.path.basename(im_list[i]))[0])
-                with open(roi_path_tmp, "w") as roi_file:
-                    # File header
-                    roi_file.write("file,x0,y0,x1,y1,x0n,y0n,x1n,y1n,label,label_str,score")
+
+                # rois
+                roiobjs = []
+                for index in range(len(bboxes)):
+                    x0, y0, x1, y1, score = bboxes[index]
+                    label = labels[index]
+                    label_str = class_names[label - 1]
+
+                    # Ignore this roi if the score is less than the provided threshold
+                    if score < score_threshold:
+                        continue
+
+                    if y0 > max_height or y1 > max_height:
+                        continue
+                    elif y0 < min_height or y1 < min_height:
+                        continue
+
+                    # Translate roi coordinates into original image coordinates (before combining)
+                    y0 -= min_height
+                    y1 -= min_height
+                    x0n = x0 / img.width
+                    y0n = y0 / img.height
+                    x1n = x1 / img.width
+                    y1n = y1 / img.height
+
+                    px = None
+                    py = None
+                    pxn = None
+                    pyn = None
+                    bw = None
+                    bh = None
+
                     if segm_result is not None:
-                        roi_file.write(",poly_x,poly_y,poly_xn,poly_yn,mask_score")
-                        if output_minrect:
-                            roi_file.write(",minrect_w,minrect_h")
-                    else:
-                        roi_file.write("\n")
-                    # rois
-                    for index in range(len(bboxes)):
-                        x0, y0, x1, y1, score = bboxes[index]
-                        label = labels[index]
-                        label_str = class_names[label - 1]
-
-                        # Ignore this roi if the score is less than the provided threshold
-                        if score < score_threshold:
-                            continue
-
-                        if y0 > max_height or y1 > max_height:
-                            continue
-                        elif y0 < min_height or y1 < min_height:
-                            continue
-
-                        # Translate roi coordinates into original image coordinates (before combining)
-                        y0 -= min_height
-                        y1 -= min_height
-                        x0n = x0 / img.width
-                        y0n = y0 / img.height
-                        x1n = x1 / img.width
-                        y1n = y1 / img.height
-
-                        # output
-                        roi_file.write("{},{},{},{},{},{},{},{},{},{},{},{}".format(os.path.basename(im_list[i]),
-                                                                                      x0, y0, x1, y1, x0n, y0n, x1n, y1n,
-                                                                                      label, label_str, score))
-                        if segm_result is not None:
-                            segms = mmcv.concat_list(segm_result)
-                            if isinstance(segms, tuple):
-                                mask = segms[0][index]
-                                mask_score = segms[1][index]
-                            else:
-                                mask = segms[index]
-                                mask_score = score
-                            mask = maskUtils.decode(mask).astype(np.int)
-                            if mask_nth > 1:
-                                rows = np.array(range(0, mask.shape[0], mask_nth))
-                                cols = np.array(range(0, mask.shape[1], mask_nth))
-                                mask_small = mask[np.ix_(rows, cols)]
-                            else:
-                                mask_small = mask
-                            poly = measure.find_contours(mask_small, mask_threshold)
-                            if len(poly) > 0:                       
-                                roi_file.write(",\"")
-                                for c in poly[0]:
-                                    roi_file.write("{},".format(c[1]))
-                                roi_file.write("\",\"")
-                                for c in poly[0]:
-                                    roi_file.write("{},".format(c[0]-min_height))
-                                roi_file.write("\",\"")
-                                for c in poly[0]:
-                                    roi_file.write("{},".format(c[1] / img.width))
-                                roi_file.write("\",\"")
-                                for c in poly[0]:
-                                    roi_file.write("{},".format((c[0]-min_height) / img.height))
-                                roi_file.write("\",{}".format(mask_score))
-
-                                if output_minrect:
-                                    rect = cv2.minAreaRect(np.float32(poly[0]))
-                                    bw = rect[1][0] * mask_nth
-                                    bh = rect[1][1] * mask_nth
-                                    roi_file.write("{},{},".format(bw, bh))
-
-                                roi_file.write("\n")
-                            else:
-                                if output_minrect:
-                                  roi_file.write(",,")
-                                roi_file.write(",,,,\n")
+                        px = []
+                        py = []
+                        pxn = []
+                        pyn = []
+                        bw = ""
+                        bh = ""
+                        segms = mmcv.concat_list(segm_result)
+                        if isinstance(segms, tuple):
+                            mask = segms[0][index]
+                            score = segms[1][index]
                         else:
-                            roi_file.write("\n")
-                os.rename(roi_path_tmp, roi_path)
+                            mask = segms[index]
+                        mask = maskUtils.decode(mask).astype(np.int)
+                        poly = mask_to_polygon(mask, mask_threshold, mask_nth=mask_nth, view=(x0, y0, x1, y1))
+                        if len(poly) > 0:
+                            px, py = polygon_to_lists(poly[0], swap_x_y=True, normalize=False, as_string=True)
+                            pxn, pyn = polygon_to_lists(poly[0], swap_x_y=True, normalize=True, img_width=image.width, img_height=image.height, as_string=True)
+                            if output_minrect:
+                                bw, bh = polygon_to_minrect(poly[0])
+
+                    roiobj = ROIObject(x0, y0, x1, y1, x0n, y0n, x1n, y1n, label, label_str, score=score,
+                                       poly_x=px, poly_y=py, poly_xn=pxn, poly_yn=pyn,
+                                       minrect_w=bw, minrect_h=bh)
+                    roiobjs.append(roiobj)
+
+                info = ImageInfo(os.path.basename(im_list[i]))
+                roiext = (info, roiobjs)
+                roiwriter = ROIWriter(output=tmp_dir if tmp_dir is not None else output_dir, no_images=True)
+                roiwriter.save([roiext])
+                if tmp_dir is not None:
+                    os.rename(roi_path_tmp, roi_path)
         except:
             print("Failed processing images: {}".format(",".join(im_list)))
             print(traceback.format_exc())
