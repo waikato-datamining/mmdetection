@@ -23,10 +23,10 @@ RUN conda install cython -y && \
     pip install --no-cache-dir -e . && \
     pip install --no-cache-dir python-image-complete wai.annotations && \
     git clone https://github.com/waikato-datamining/mmdetection.git /opt/mmdetection && \
-    mv /opt/mmdetection/2019-11-30/base/mmdet_* /usr/bin/. && \
-    mv /opt/mmdetection/2019-11-30/base/predict.py /mmdetection/. && \
-    mv /opt/mmdetection/2019-11-30/base/__init__.py /mmdetection/mmdet/datasets/. && \
-    mv /opt/mmdetection/2019-11-30/base/dataset.py /mmdetection/mmdet/datasets/.
+    cp /opt/mmdetection/2019-11-30/base/mmdet_* /usr/bin && \
+    cp /opt/mmdetection/2019-11-30/base/predict.py /mmdetection && \
+    cp /opt/mmdetection/2019-11-30/base/__init__.py /mmdetection/mmdet/datasets && \
+    cp /opt/mmdetection/2019-11-30/base/dataset.py /mmdetection/mmdet/datasets
 
 WORKDIR /mmdetection
 
