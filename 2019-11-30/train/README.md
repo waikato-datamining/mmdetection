@@ -30,7 +30,7 @@ Sat Nov 30 04:28:00 2019 +1300
 
   ```commandline
   sudo docker run --runtime=nvidia --shm-size 8G -v /local:/container -it \
-    -e CLASSES=\'class1\',\'class2\',... mmdet_train /path_to/your_data_config.py --autoscale-lr
+    -e MMDET_CLASSES=\'class1\',\'class2\',... mmdet_train /path_to/your_data_config.py --autoscale-lr
   ```
   "/local:/container" maps a local disk directory into a directory inside the container
 
@@ -86,7 +86,7 @@ Sat Nov 30 04:28:00 2019 +1300
 
   ```commandline
   docker run --runtime=nvidia --shm-size 8G -v /local:/container -it \
-    -e CLASSES=\'class1\',\'class2\',... open-mmlab/mmdetection:2019-11-30_train \
+    -e MMDET_CLASSES=\'class1\',\'class2\',... open-mmlab/mmdetection:2019-11-30_train \
     /path_to/your_data_config.py --autoscale-lr
   ```
   "/local:/container" maps a local disk directory into a directory inside the container

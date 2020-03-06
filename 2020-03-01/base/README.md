@@ -39,10 +39,10 @@ March 1st, 2020
   [wai.annotations](https://github.com/waikato-ufdl/wai-annotations). 
   Conversion must be done twice, once for training set and again for validation set.
   
-* Store class names or label strings in an environment variable called "CLASSES" **(inside the container)**:
+* Store class names or label strings in an environment variable called "MMDET_CLASSES" **(inside the container)**:
 
   ```commandline
-  export CLASSES=\'class1\',\'class2\',...
+  export MMDET_CLASSES=\'class1\',\'class2\',...
   ```
 
 * Copy the config file (of the model you want to train) from /mmdetection/configs (inside the container) or 

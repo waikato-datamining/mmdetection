@@ -6,4 +6,4 @@ import os
 @DATASETS.register_module
 class Dataset(CocoDataset):
 
-    CLASSES = (os.environ['CLASSES'])
+    CLASSES = (os.environ['MMDET_CLASSES'])

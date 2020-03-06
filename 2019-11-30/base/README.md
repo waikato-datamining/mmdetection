@@ -38,10 +38,10 @@ Sat Nov 30 04:28:00 2019 +1300
 * Convert annotations (in ADAMS report format) to MS COCO JSON format using [wai.annotations](https://github.com/waikato-ufdl/wai-annotations). 
   Conversion must be done twice, once for training set and again for validation set.
   
-* Store class names or label strings in an environment variable called "CLASSES" **(inside the container)**:
+* Store class names or label strings in an environment variable called "MMDET_CLASSES" **(inside the container)**:
 
   ```commandline
-  export CLASSES=\'class1\',\'class2\',...
+  export MMDET_CLASSES=\'class1\',\'class2\',...
   ```
 
 * Copy the config file (of the model you want to train) from /mmdetection/configs (inside the container) or from [here](https://github.com/open-mmlab/mmdetection/tree/b7894cbdcbe114e3e9efdd1a6a229419a552c807/configs) to local disk, then follow [these instructions](#config).

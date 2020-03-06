@@ -30,7 +30,7 @@ March 1st, 2020
 
   ```commandline
   sudo docker run --runtime=nvidia --shm-size 8G -v /local:/container -it \
-    -e CLASSES=\'class1\',\'class2\',... mmdet_predict \
+    -e MMDET_CLASSES=\'class1\',\'class2\',... mmdet_predict \
     --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
     --prediction_in /path_to/test_imgs/ --prediction_out /path_to/test_results/ \
     --labels /path_to/your_data/labels.txt --score 0 --num_imgs 3 --output_inference_time
@@ -88,7 +88,7 @@ March 1st, 2020
 
   ```commandline
   docker run --runtime=nvidia --shm-size 8G -v /local:/container -it \
-    -e CLASSES=\'class1\',\'class2\',... open-mmlab/mmdetection:2020-03-01_predict \
+    -e MMDET_CLASSES=\'class1\',\'class2\',... open-mmlab/mmdetection:2020-03-01_predict \
     --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
     --prediction_in /path_to/test_imgs/ --prediction_out /path_to/test_results/ \
     --labels /path_to/your_data/labels.txt --score 0 --num_imgs 3 --output_inference_time
