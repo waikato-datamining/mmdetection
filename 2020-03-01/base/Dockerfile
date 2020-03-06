@@ -19,15 +19,15 @@ RUN conda install cython -y && \
     conda clean --all && \
     git clone https://github.com/open-mmlab/mmdetection.git /mmdetection && \
     cd /mmdetection && \
-    git reset --hard 51df8a9b7ad5f25ebd75cf8e0969c3b728bde08d && \
-    pip install --no-cache-dir -e . && \
-    python setup.py develop && \
-    pip install --no-cache-dir python-image-complete wai.annotations && \
-    git clone https://github.com/waikato-datamining/mmdetection.git /opt/mmdetection && \
-    cp /opt/mmdetection/2020-03-01/base/mmdet_* /usr/bin && \
-    cp /opt/mmdetection/2020-03-01/base/predict.py /mmdetection && \
-    cp /opt/mmdetection/2020-03-01/base/__init__.py /mmdetection/mmdet/datasets && \
-    cp /opt/mmdetection/2020-03-01/base/dataset.py /mmdetection/mmdet/datasets
+    git reset --hard 51df8a9b7ad5f25ebd75cf8e0969c3b728bde08d
+RUN pip install --no-cache-dir -e .
+RUN python setup.py develop
+RUN pip install --no-cache-dir python-image-complete wai.annotations
+RUN git clone https://github.com/waikato-datamining/mmdetection.git /opt/mmdetection
+RUN cp /opt/mmdetection/2020-03-01/base/mmdet_* /usr/bin
+RUN cp /opt/mmdetection/2020-03-01/base/predict.py /mmdetection
+RUN cp /opt/mmdetection/2020-03-01/base/__init__.py /mmdetection/mmdet/datasets
+RUN cp /opt/mmdetection/2020-03-01/base/dataset.py /mmdetection/mmdet/datasets
 
 WORKDIR /mmdetection
 
