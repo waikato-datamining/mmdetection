@@ -20,8 +20,8 @@ RUN conda install cython -y && \
     git clone https://github.com/open-mmlab/mmdetection.git /mmdetection && \
     cd /mmdetection && \
     git reset --hard 51df8a9b7ad5f25ebd75cf8e0969c3b728bde08d && \
-    python setup.py develop && \
     pip install --no-cache-dir -e . && \
+    python setup.py develop && \
     pip install --no-cache-dir python-image-complete wai.annotations && \
     git clone https://github.com/waikato-datamining/mmdetection.git /opt/mmdetection && \
     cp /opt/mmdetection/2020-03-01/base/mmdet_* /usr/bin && \
