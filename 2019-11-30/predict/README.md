@@ -42,21 +42,21 @@ Sat Nov 30 04:28:00 2019 +1300
 * Build
 
   ```commandline
-  docker build -t open-mmlab/mmdetection:2019-11-30_predict .
+  docker build -t open-mmlab/mmdetection_predict:2019-11-30 .
   ```
   
 * Tag
 
   ```commandline
   docker tag \
-    open-mmlab/mmdetection:2019-11-30_predict \
-    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30_predict
+    open-mmlab/mmdetection_predict:2019-11-30 \
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection_predict:2019-11-30
   ```
   
 * Push
 
   ```commandline
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30_predict
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection_predict:2019-11-30
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -69,7 +69,7 @@ Sat Nov 30 04:28:00 2019 +1300
   If image is available in aml-repo and you just want to use it, you can pull using following command and then [run](#run).
 
   ```commandline
-  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30_predict
+  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection_predict:2019-11-30
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -80,15 +80,15 @@ Sat Nov 30 04:28:00 2019 +1300
   
   ```commandline
   docker tag \
-    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30_predict \
-    open-mmlab/mmdetection:2019-11-30_predict
+    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection_predict:2019-11-30 \
+    open-mmlab/mmdetection_predict:2019-11-30
   ```
 
 * <a name="run">Run</a>
 
   ```commandline
   docker run --runtime=nvidia --shm-size 8G -v /local:/container -it \
-    -e MMDET_CLASSES=\'class1\',\'class2\',... open-mmlab/mmdetection:2019-11-30_predict \
+    -e MMDET_CLASSES=\'class1\',\'class2\',... open-mmlab/mmdetection_predict:2019-11-30 \
     --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
     --prediction_in /path_to/test_imgs/ --prediction_out /path_to/test_results/ \
     --labels /path_to/your_data/labels.txt --score 0 --num_imgs 3 --output_inference_time

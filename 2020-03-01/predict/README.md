@@ -42,21 +42,21 @@ March 1st, 2020
 * Build
 
   ```commandline
-  docker build -t open-mmlab/mmdetection:2020-03-01_predict .
+  docker build -t open-mmlab/mmdetection_predict:2020-03-01 .
   ```
   
 * Tag
 
   ```commandline
   docker tag \
-    open-mmlab/mmdetection:2020-03-01_predict \
-    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_predict
+    open-mmlab/mmdetection_predict:2020-03-01 \
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection_predict:2020-03-01
   ```
   
 * Push
 
   ```commandline
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_predict
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection_predict:2020-03-01
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -69,7 +69,7 @@ March 1st, 2020
   If image is available in aml-repo and you just want to use it, you can pull using following command and then [run](#run).
 
   ```commandline
-  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_predict
+  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection_predict:2020-03-01
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -80,15 +80,15 @@ March 1st, 2020
   
   ```commandline
   docker tag \
-    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_predict \
-    open-mmlab/mmdetection:2020-03-01_predict
+    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection_predict:2020-03-01 \
+    open-mmlab/mmdetection_predict:2020-03-01
   ```
 
 * <a name="run">Run</a>
 
   ```commandline
   docker run --runtime=nvidia --shm-size 8G -v /local:/container -it \
-    -e MMDET_CLASSES=\'class1\',\'class2\',... open-mmlab/mmdetection:2020-03-01_predict \
+    -e MMDET_CLASSES=\'class1\',\'class2\',... open-mmlab/mmdetection_predict:2020-03-01 \
     --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
     --prediction_in /path_to/test_imgs/ --prediction_out /path_to/test_results/ \
     --labels /path_to/your_data/labels.txt --score 0 --num_imgs 3 --output_inference_time
