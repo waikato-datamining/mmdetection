@@ -34,7 +34,7 @@ MAX_INCOMPLETE = 3
 def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold, 
                       num_imgs, inference_times, delete_input, mask_threshold, mask_nth, 
                       output_minrect, view_margin, fully_connected, fit_bbox_to_polygon,
-                      output_width_height):
+                      output_width_height, bbox_as_fallback):
     """
     Method performing predictions on all images ony by one or combined as specified by the int value of num_imgs.
 
@@ -69,6 +69,8 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :type fit_bbox_to_polygon: bool
     :param output_width_height: whether to output x/y/w/h instead of x0/y0/x1/y1
     :type output_width_height: bool
+    :param bbox_as_fallback: if ratio between polygon-bbox and bbox is smaller than this value, use bbox as fallback polygon, ignored if < 0
+    :type bbox_as_fallback: float
     """
 
     # Iterate through all files present in "input_dir"
@@ -234,13 +236,32 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                         poly = mask_to_polygon(mask, mask_threshold, mask_nth=mask_nth, view=(x0, y0, x1, y1),
                                                view_margin=view_margin, fully_connected=fully_connected)
                         if len(poly) > 0:
-                            px, py = polygon_to_lists(poly[0], swap_x_y=True, normalize=False, as_string=True)
-                            pxn, pyn = polygon_to_lists(poly[0], swap_x_y=True, normalize=True, img_width=image.width, img_height=image.height, as_string=True)
+                            px, py = polygon_to_lists(poly[0], swap_x_y=True, normalize=False)
+                            pxn, pyn = polygon_to_lists(poly[0], swap_x_y=True, normalize=True, img_width=image.width, img_height=image.height)
                             if output_minrect:
                                 bw, bh = polygon_to_minrect(poly[0])
-                            if fit_bbox_to_polygon and (len(px) >= 3):
-                                x0, y0, x1, y1 = polygon_to_bbox(lists_to_polygon(px, py))
-                                x0n, y0n, x1n, y1n = polygon_to_bbox(lists_to_polygon(pxn, pyn))
+                            if bbox_as_fallback >= 0:
+                                if len(px) >= 3:
+                                    p_x0n, p_y0n, p_x1n, p_y1n = polygon_to_bbox(lists_to_polygon(pxn, pyn))
+                                    p_area = (p_x1n - p_x0n) * (p_y1n - p_y0n)
+                                    b_area = (x1n - x0n) * (y1n - y0n)
+                                    if (b_area > 0) and (p_area / b_area < bbox_as_fallback):
+                                        px = [float(i) for i in [x0, x1, x1, x0]]
+                                        py = [float(i) for i in [y0, y0, y1, y1]]
+                                        pxn = [float(i) for i in [x0n, x1n, x1n, x0n]]
+                                        pyn = [float(i) for i in [y0n, y0n, y1n, y1n]]
+                                else:
+                                    px = [float(i) for i in [x0, x1, x1, x0]]
+                                    py = [float(i) for i in [y0, y0, y1, y1]]
+                                    pxn = [float(i) for i in [x0n, x1n, x1n, x0n]]
+                                    pyn = [float(i) for i in [y0n, y0n, y1n, y1n]]
+                                if output_minrect:
+                                    bw = x1 - x0 + 1
+                                    bh = y1 - y0 + 1
+                            if fit_bbox_to_polygon:
+                                if len(px) >= 3:
+                                    x0, y0, x1, y1 = polygon_to_bbox(lists_to_polygon(px, py))
+                                    x0n, y0n, x1n, y1n = polygon_to_bbox(lists_to_polygon(pxn, pyn))
 
                     roiobj = ROIObject(x0, y0, x1, y1, x0n, y0n, x1n, y1n, label, label_str, score=score,
                                        poly_x=px, poly_y=py, poly_xn=pxn, poly_yn=pyn,
@@ -301,6 +322,10 @@ if __name__ == '__main__':
     parser.add_argument('--mask_nth', type=int, help='To speed polygon detection up, use every nth row and column only', required=False, default=1)
     parser.add_argument('--output_minrect', action='store_true', help='When outputting polygons whether to store the minimal rectangle around the objects in the CSV files as well', required=False, default=False)
     parser.add_argument('--fit_bbox_to_polygon', action='store_true', help='Whether to fit the bounding box to the polygon', required=False, default=False)
+    parser.add_argument('--bbox_as_fallback', default=-1.0, type=float,
+                        help='When outputting polygons the bbox can be used as fallback polygon. This happens if the ratio '
+                             + 'between the surrounding bbox of the polygon and the bbox is smaller than the specified value. '
+                             + 'Turned off if < 0.', required=False)
     parser.add_argument('--num_imgs', type=int, help='Number of images to combine', required=False, default=1)
     parser.add_argument('--status', help='file path for predict exit status file', required=False, default=None)
     parser.add_argument('--continuous', action='store_true', help='Whether to continuously load test images and perform prediction', required=False, default=False)
@@ -310,6 +335,9 @@ if __name__ == '__main__':
     parser.add_argument('--fully_connected', default='high', choices=['high', 'low'], required=False, help='When determining polygons, whether regions of high or low values should be fully-connected at isthmuses')
     parser.add_argument('--output_width_height', action='store_true', help="Whether to output x/y/w/h instead of x0/y0/x1/y1 in the ROI CSV files", required=False, default=False)
     parsed = parser.parse_args()
+
+    if parsed.fit_bbox_to_polygon and (parsed.bbox_as_fallback >= 0):
+        raise Exception("Options --fit_bbox_to_polygon and --bbox_as_fallback cannot be used together!")
 
     try:
         # This is the actual model that is used for the object detection
@@ -323,10 +351,11 @@ if __name__ == '__main__':
         while True:
             # Performing the prediction and producing the csv files
             predict_on_images(parsed.prediction_in, model, parsed.prediction_out, parsed.prediction_tmp, class_names,
-                                            parsed.score, parsed.num_imgs, parsed.output_inference_time,
-                                            parsed.delete_input, parsed.mask_threshold, parsed.mask_nth,
-                                            parsed.output_minrect, parsed.view_margin, parsed.fully_connected,
-                                            parsed.fit_bbox_to_polygon, parsed.output_width_height)
+                              parsed.score, parsed.num_imgs, parsed.output_inference_time,
+                              parsed.delete_input, parsed.mask_threshold, parsed.mask_nth,
+                              parsed.output_minrect, parsed.view_margin, parsed.fully_connected,
+                              parsed.fit_bbox_to_polygon, parsed.output_width_height,
+                              parsed.bbox_as_fallback)
 
             # Exit if not continuous
             if not parsed.continuous:
