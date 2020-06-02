@@ -193,7 +193,7 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                 for index in range(len(bboxes)):
                     x0, y0, x1, y1, score = bboxes[index]
                     label = labels[index]
-                    label_str = class_names[label - 1]
+                    label_str = class_names[label]
 
                     # Ignore this roi if the score is less than the provided threshold
                     if score < score_threshold:
