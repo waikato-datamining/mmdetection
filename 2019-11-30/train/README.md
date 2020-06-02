@@ -1,6 +1,6 @@
 # Training with MMDetection
 
-Allows processing of images with MMDetection.
+Allows processing of images with [MMDetection](https://github.com/open-mmlab/mmdetection).
 
 ## Version
 
