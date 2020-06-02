@@ -88,6 +88,8 @@ March 1st, 2020
   ```
   Run with -h for all available options.
 
+  `--labels` is a text file with a comma-separated list of labels (excluding the background)
+
   You may also need to specify the following options:
 
   * `--mask_threshold` - if using another threshold than the default of 0.1

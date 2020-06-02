@@ -93,7 +93,8 @@ Sat Nov 30 04:28:00 2019 +1300
     --prediction_in /path_to/test_imgs/ --prediction_out /path_to/test_results/ \
     --labels /path_to/your_data/labels.txt --score 0 --num_imgs 3 --output_inference_time
   ```
-  `/local:/container` maps a local disk directory into a directory inside the container
+  `/local:/container` maps a local disk directory into a directory inside the container, 
+  `--labels` is a text file with a comma-separated list of labels (excluding the background)
 
 
 ## Permissions
