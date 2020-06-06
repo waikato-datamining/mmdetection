@@ -14,6 +14,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+COPY bash.bashrc /etc/bash.bashrc
+
 # Install mmdetection
 RUN conda install cython -y && \
     conda clean --all && \
