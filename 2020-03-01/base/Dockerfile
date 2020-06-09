@@ -29,7 +29,8 @@ RUN conda install cython -y && \
     cp /opt/mmdetection/2020-03-01/base/mmdet_* /usr/bin && \
     cp /opt/mmdetection/2020-03-01/base/predict.py /mmdetection && \
     cp /opt/mmdetection/2020-03-01/base/__init__.py /mmdetection/mmdet/datasets && \
-    cp /opt/mmdetection/2020-03-01/base/dataset.py /mmdetection/mmdet/datasets
+    cp /opt/mmdetection/2020-03-01/base/dataset.py /mmdetection/mmdet/datasets && \
+    mkdir -m 0777 /.cache
 
 WORKDIR /mmdetection
 
