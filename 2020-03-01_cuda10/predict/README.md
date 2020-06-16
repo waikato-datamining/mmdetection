@@ -4,6 +4,8 @@ Allows processing of images with [MMDetection](https://github.com/open-mmlab/mmd
 
 Uses PyTorch 1.2 and CUDA 10.0.
 
+Works on 1080 Ti cards. 
+
 ## Version
 
 MMDetection github repo hash:
