@@ -2,6 +2,8 @@
 
 Allows processing of images with [MMDetection](https://github.com/open-mmlab/mmdetection).
 
+Uses PyTorch 1.3 and CUDA 10.1.
+
 ## Version
 
 MMDetection github repo hash:
