@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd /mmdetection
+python tools/train.py "$@"
