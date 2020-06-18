@@ -345,7 +345,7 @@ if __name__ == '__main__':
         
         # Get class names
         with open(parsed.labels, "r") as labels_file:
-            class_names = labels_file.read()
+            class_names = labels_file.read().strip()
             class_names = class_names.split(",")
 
         while True:
