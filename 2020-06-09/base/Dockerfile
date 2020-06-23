@@ -32,5 +32,7 @@ RUN conda install cython -y && \
     cp /opt/mmdetection/2020-06-09/base/dataset.py /mmdetection/mmdet/datasets && \
     mkdir -m 0777 /.cache
 
+ENV PYTHONPATH="/mmdetection"
+
 WORKDIR /mmdetection
 
