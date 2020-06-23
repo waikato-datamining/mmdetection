@@ -23,9 +23,8 @@ RUN conda install cython -y && \
     cd /mmdetection && \
     git reset --hard v2.1.0 && \
     export FORCE_CUDA=1 && \
-    pip install --no-cache-dir --upgrade pip \
     pip install --no-cache-dir -e . && \
-    pip install --no-cache-dir python-image-complete wai.annotations && \
+    pip install --no-cache-dir python-image-complete "wai.annotations<0.3.6" && \
     git clone https://github.com/waikato-datamining/mmdetection.git /opt/mmdetection && \
     cp /opt/mmdetection/2020-06-09/base/mmdet_* /usr/bin && \
     cp /opt/mmdetection/2020-06-09/base/predict.py /mmdetection && \
