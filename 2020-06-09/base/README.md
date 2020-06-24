@@ -161,23 +161,26 @@ June 9th, 2020
 
 * [Faster R-CNN ResNet101 FPN (minimal)](templates/faster_rcnn_fpn-minimal.py)
 * [Faster R-CNN ResNet101 FPN (full)](templates/faster_rcnn_fpn-full.py)
+* [RetinaNet X101 FPN (minimal)](templates/retinanet_x101_32x4d_fpn_1x-minimal.py)
+* [RetinaNet X101 FPN (full)](templates/retinanet_x101_32x4d_fpn_1x-full.py)
 
 
 ## <a name="config">Preparing the config file</a>
 
-1. In `train_cfg` and `test_cfg`: change `nms_pre`, `nms_post`, and `max_num` to the preferred values.
-2. Change `dataset_type` to `Dataset`
-3. Change `data_root` to the root path of your dataset (the directory containing train and val directories).
-4. Copy/paste `train_pipeline = [...]` and rename it to `val_pipeline`.
-5. Change `pipeline` for `val` to `val_pipeline`.
-6. In `train_pipeline`, `val_pipeline` and `test_pipeline`: change `img_scale` to preferred values. 
+1. If necessary, change `num_classes` to labels + 1 (BG).
+2. In `train_cfg` and `test_cfg`: change `nms_pre`, `nms_post`, and `max_num` to the preferred values.
+3. Change `dataset_type` to `Dataset`
+4. Change `data_root` to the root path of your dataset (the directory containing train and val directories).
+5. Copy/paste `train_pipeline = [...]` and rename it to `val_pipeline`.
+6. Change `pipeline` for `val` to `val_pipeline`.
+7. In `train_pipeline`, `val_pipeline` and `test_pipeline`: change `img_scale` to preferred values. 
    Image will be scaled to the smaller value between (larger_scale/larger_image_side) and (smaller_scale/smaller_image_side).
-7. Adapt `ann_file` and `img_prefix` to suit your dataset.
-8. Interval in `checkpoint_config` will determine the frequency of saving models while training 
+8. Adapt `ann_file` and `img_prefix` to suit your dataset.
+9. Interval in `checkpoint_config` will determine the frequency of saving models while training 
    (10 for example will save a model after every 10 epochs).
-9. Change `total_epochs` to how many epochs you want to train the model for.
-10. Change `work_dir` to the path where you want to save the trained models to.
-11. If you want to include the validation set, add `, ('val', 1)` to `workflow`.
+10. Change `total_epochs` to how many epochs you want to train the model for.
+11. Change `work_dir` to the path where you want to save the trained models to.
+12. If you want to include the validation set, add `, ('val', 1)` to `workflow`.
 
 _You don't have to copy the config file back, just point at it when training._
 
