@@ -216,3 +216,6 @@ Or specifically for PyTorch:
 ```
 -v /somewhere/local/cache/torch:/.cache/torch
 ```
+
+**NB:** When running the container as root rather than a specific user, the internal directory will have to be
+prefixed with `/root`. 
