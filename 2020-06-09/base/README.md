@@ -163,6 +163,7 @@ June 9th, 2020
 * [Faster R-CNN ResNet101 FPN (full)](templates/faster_rcnn_fpn-full.py)
 * [RetinaNet X101 FPN (minimal)](templates/retinanet_x101_32x4d_fpn_1x-minimal.py)
 * [RetinaNet X101 FPN (full)](templates/retinanet_x101_32x4d_fpn_1x-full.py)
+* [more](https://github.com/open-mmlab/mmdetection/blob/v2.1.0/docs/model_zoo.md)
 
 
 ## <a name="config">Preparing the config file</a>
