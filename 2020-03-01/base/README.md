@@ -175,6 +175,11 @@ March 1st, 2020
 
 _You don't have to copy the config file back, just point at it when training._
 
+**NB:** Make sure not to store the config file in the output directory, as MMDetection
+will place a fully expanded version of the config file in the output directory,
+using the same name. In other words, it will overwrite the original file if
+it was located in the output directory.*
+
 
 ## Permissions
 
