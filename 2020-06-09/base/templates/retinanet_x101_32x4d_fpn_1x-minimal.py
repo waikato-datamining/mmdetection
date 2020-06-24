@@ -1,10 +1,28 @@
-# Template for Faster R-CNN ResNet101 FPN
-# the base configuration the configuration is based on
-_base_ = "/mmdetection/configs/faster_rcnn/faster_rcnn_r101_fpn_1x_coco.py"
+# Template for RetinaNet X101 FPN
+# the base configuration to inherit from
+_base_ = "/mmdetection/configs/retinanet/retinanet_x101_32x4d_fpn_1x_coco.py"
+# training and testing settings
+train_cfg = dict(
+    assigner=dict(
+        type='MaxIoUAssigner',
+        pos_iou_thr=0.5,
+        neg_iou_thr=0.4,
+        min_pos_iou=0,
+        ignore_iof_thr=-1),
+    allowed_border=-1,
+    pos_weight=-1,
+    debug=False)
+test_cfg = dict(
+    nms_pre=1000,
+    min_bbox_size=0,
+    score_thr=0.05,
+    nms=dict(type='nms', iou_thr=0.5),
+    max_per_img=100)
+# dataset settings
 # this type uses the MMDET_CLASSES environment variable
 dataset_type = 'Dataset'
 # the root directory for train/test/val images and json files
-data_root = '/data/somewhere'
+data_root = '/data/buttercup_whole_only-2020-05-01'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -50,12 +68,31 @@ data = dict(
         ann_file=data_root + '/test.json',
         img_prefix=data_root + '/',
         pipeline=test_pipeline))
-# the number of epochs to train
-total_epochs = 10
+# learning policy
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=1.0 / 3,
+    step=[8, 11])
 # output a checkpoint every X epochs
 checkpoint_config = dict(interval=5)
-# the pre-trained model to use
-load_from = '/models/faster_rcnn_r101_fpn_1x_20181129-d1468807.pth'
-workflow = [('train', 1)]
+# yapf:disable
+log_config = dict(
+    interval=50,
+    hooks=[
+        dict(type='TextLoggerHook'),
+        # dict(type='TensorboardLoggerHook')
+    ])
+# yapf:enable
+# runtime settings
+# the number of epochs to train
+total_epochs = 10
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
 # the directory to output the log files, checkpoints and fully expanded config file
-work_dir = '/output/somewhere'
+work_dir = '/output/buttercup_whole_only-2020-05-01-retinanet_x101.test'
+# the pre-trained model to use
+load_from = '/models/retinanet_x101_32x4d_fpn_1x_coco_20200130-5c8b7ec4.pth'
+resume_from = None
+workflow = [('train', 1)]
