@@ -58,9 +58,9 @@ Sat Nov 30 04:28:00 2019 +1300
 * Run the container
 
   ```commandline
-  sudo docker run --runtime=nvidia --shm-size 8G -v /local:/container -it mmdet
+  sudo docker run --runtime=nvidia --shm-size 8G -v /local/dir:/container/dir -it mmdet
   ```
-  `/local:/container` maps a local disk directory into a directory inside the container
+  `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
 ### Usage
 
@@ -149,9 +149,9 @@ Sat Nov 30 04:28:00 2019 +1300
 
   ```commandline
   docker run --runtime=nvidia --shm-size 8G \
-    -v /local:/container -it open-mmlab/mmdetection:2019-11-30
+    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2019-11-30
   ```
-  `/local:/container` maps a local disk directory into a directory inside the container
+  `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
   
 ## <a name="config">Preparing the config file</a>

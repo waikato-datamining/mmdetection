@@ -33,10 +33,10 @@ Sat Nov 30 04:28:00 2019 +1300
 * Run the container
 
   ```commandline
-  sudo docker run --runtime=nvidia --shm-size 8G -v /local:/container -it \
+  sudo docker run --runtime=nvidia --shm-size 8G -v /local/dir:/container/dir -it \
     -e MMDET_CLASSES=\'class1\',\'class2\',... mmdet_train /path_to/your_data_config.py --autoscale-lr
   ```
-  `/local:/container` maps a local disk directory into a directory inside the container
+  `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
 
 ### Pre-built images
@@ -89,11 +89,11 @@ Sat Nov 30 04:28:00 2019 +1300
 * <a name="run">Run</a>
 
   ```commandline
-  docker run --runtime=nvidia --shm-size 8G -v /local:/container -it \
+  docker run --runtime=nvidia --shm-size 8G -v /local/dir:/container/dir -it \
     -e MMDET_CLASSES=\'class1\',\'class2\',... open-mmlab/mmdetection_train:2019-11-30 \
     /path_to/your_data_config.py --autoscale-lr
   ```
-  `/local:/container` maps a local disk directory into a directory inside the container
+  `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
 
 ## Permissions
