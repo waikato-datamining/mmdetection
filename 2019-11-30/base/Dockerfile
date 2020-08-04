@@ -1,7 +1,6 @@
 ARG PYTORCH="1.3"
 ARG CUDA="10.1"
 ARG CUDNN="7"
-ARG MMDET_CLASSES="a,b,c"
 
 ARG DOCKER_REGISTRY=public.aml-repo.cms.waikato.ac.nz:443/
 FROM ${DOCKER_REGISTRY}pytorch/pytorch:${PYTORCH}-cuda${CUDA}-cudnn${CUDNN}-devel
