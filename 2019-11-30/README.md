@@ -2,22 +2,22 @@
 
 Allows processing of images with [MMDetection](https://github.com/open-mmlab/mmdetection).
 
-Uses PyTorch 1.2 and CUDA 10.0.
+Uses PyTorch 1.3 and CUDA 10.1.
 
-Works on 1080 Ti cards. 
+Does not work on 1080 Ti cards. 
 
 ## Version
 
 MMDetection github repo hash:
 
 ```
-51df8a9b7ad5f25ebd75cf8e0969c3b728bde08d
+b7894cbdcbe114e3e9efdd1a6a229419a552c807
 ```
 
 and timestamp:
 
 ```
-March 1st, 2020
+Sat Nov 30 04:28:00 2019 +1300
 ```
 
 ## Docker
@@ -35,7 +35,7 @@ March 1st, 2020
   ```commandline
   docker run --runtime=nvidia --shm-size 8G \
     -v /local/dir:/container/dir \
-    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_cuda10
+    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30
   ```
 
   **NB:** For docker versions 19.03 (`docker version`) and newer, use `--gpus=all` instead of `--runtime=nvidia`.
@@ -45,10 +45,11 @@ March 1st, 2020
   ```commandline
   docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q) && docker system prune -a
   ```
+ 
 
 ### Build local image
 
-* Build the image from Docker file (from within /path_to/mmdetection/2020-03-01_cuda10/base)
+* Build the image from Docker file (from within /path_to/mmdetection/2019-11-30)
 
   ```commandline
   sudo docker build -t mmdet .
@@ -63,8 +64,7 @@ March 1st, 2020
 
 ### Usage
 
-* Convert annotations (in ADAMS report format) to MS COCO JSON format using 
-  [wai.annotations](https://github.com/waikato-ufdl/wai-annotations). 
+* Convert annotations (in ADAMS report format) to MS COCO JSON format using [wai.annotations](https://github.com/waikato-ufdl/wai-annotations). 
   Conversion must be done twice, once for training set and again for validation set.
   
 * Store class names or label strings in an environment variable called `MMDET_CLASSES` **(inside the container)**:
@@ -88,9 +88,7 @@ March 1st, 2020
     export MMDET_CLASSES=/data/labels.txt
     ```
 
-* Copy the config file (of the model you want to train) from /mmdetection/configs (inside the container) or 
-  from [here](https://github.com/open-mmlab/mmdetection/tree/b7894cbdcbe114e3e9efdd1a6a229419a552c807/configs) 
-  to local disk, then follow [these instructions](#config).
+* Copy the config file (of the model you want to train) from /mmdetection/configs (inside the container) or from [here](https://github.com/open-mmlab/mmdetection/tree/b7894cbdcbe114e3e9efdd1a6a229419a552c807/configs) to local disk, then follow [these instructions](#config).
 
 * Train
 
@@ -105,8 +103,8 @@ March 1st, 2020
     --prediction_in /path_to/test_imgs/ --prediction_out /path_to/test_results/ \
     --labels /path_to/your_data/labels.txt --score 0 --num_imgs 3 --output_inference_time
   ```
-  Run with -h for all available options.
-
+  Run with -h for all available options. 
+ 
   `--labels` is a text file with a comma-separated list of labels (excluding the background)
 
   You may also need to specify the following options:
@@ -120,21 +118,21 @@ March 1st, 2020
 * Build
 
   ```commandline
-  docker build -t open-mmlab/mmdetection:2020-03-01_cuda10 .
+  docker build -t open-mmlab/mmdetection:2019-11-30 .
   ```
   
 * Tag
 
   ```commandline
   docker tag \
-    mmdetection:2020-03-01_cuda10 \
-    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_cuda10
+    mmdetection:2019-11-30 \
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30
   ```
   
 * Push
 
   ```commandline
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_cuda10
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -147,7 +145,7 @@ March 1st, 2020
   If image is available in aml-repo and you just want to use it, you can pull using following command and then [run](#run).
 
   ```commandline
-  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_cuda10
+  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -158,15 +156,15 @@ March 1st, 2020
   
   ```commandline
   docker tag \
-    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_cuda10 \
-    open-mmlab/mmdetection:2020-03-01_cuda10
+    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30 \
+    open-mmlab/mmdetection:2019-11-30
   ```
   
 * <a name="run">Run</a>
 
   ```commandline
   docker run --runtime=nvidia --shm-size 8G \
-    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2020-03-01_cuda10
+    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2019-11-30
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 

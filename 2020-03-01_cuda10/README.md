@@ -2,23 +2,22 @@
 
 Allows processing of images with [MMDetection](https://github.com/open-mmlab/mmdetection).
 
-Uses PyTorch 1.3 and CUDA 10.1.
+Uses PyTorch 1.2 and CUDA 10.0.
 
-Does not work on 1080 Ti cards. 
+Works on 1080 Ti cards. 
 
 ## Version
 
-MMDetection github repo tag/hash:
+MMDetection github repo hash:
 
 ```
-v2.1.0
-99a31d25b4d685da5ae868776a0483b80e8fb903
+51df8a9b7ad5f25ebd75cf8e0969c3b728bde08d
 ```
 
 and timestamp:
 
 ```
-June 9th, 2020
+March 1st, 2020
 ```
 
 ## Docker
@@ -36,7 +35,7 @@ June 9th, 2020
   ```commandline
   docker run --runtime=nvidia --shm-size 8G \
     -v /local/dir:/container/dir \
-    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-06-09
+    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_cuda10
   ```
 
   **NB:** For docker versions 19.03 (`docker version`) and newer, use `--gpus=all` instead of `--runtime=nvidia`.
@@ -49,7 +48,7 @@ June 9th, 2020
 
 ### Build local image
 
-* Build the image from Docker file (from within /path_to/mmdetection/2020-06-09/base)
+* Build the image from Docker file (from within /path_to/mmdetection/2020-03-01_cuda10)
 
   ```commandline
   sudo docker build -t mmdet .
@@ -121,21 +120,21 @@ June 9th, 2020
 * Build
 
   ```commandline
-  docker build -t open-mmlab/mmdetection:2020-06-09 .
+  docker build -t open-mmlab/mmdetection:2020-03-01_cuda10 .
   ```
   
 * Tag
 
   ```commandline
   docker tag \
-    mmdetection:2020-06-09 \
-    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-06-09
+    mmdetection:2020-03-01_cuda10 \
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_cuda10
   ```
   
 * Push
 
   ```commandline
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-06-09
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_cuda10
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -148,7 +147,7 @@ June 9th, 2020
   If image is available in aml-repo and you just want to use it, you can pull using following command and then [run](#run).
 
   ```commandline
-  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-06-09
+  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_cuda10
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -159,31 +158,22 @@ June 9th, 2020
   
   ```commandline
   docker tag \
-    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-06-09 \
-    open-mmlab/mmdetection:2020-06-09
+    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-03-01_cuda10 \
+    open-mmlab/mmdetection:2020-03-01_cuda10
   ```
   
 * <a name="run">Run</a>
 
   ```commandline
   docker run --runtime=nvidia --shm-size 8G \
-    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2020-06-09
+    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2020-03-01_cuda10
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
-
-## Example config files
-
-* [Faster R-CNN ResNet101 FPN (minimal)](templates/faster_rcnn_fpn-minimal.py)
-* [Faster R-CNN ResNet101 FPN (full)](templates/faster_rcnn_fpn-full.py)
-* [RetinaNet X101 FPN (minimal)](templates/retinanet_x101_32x4d_fpn_1x-minimal.py)
-* [RetinaNet X101 FPN (full)](templates/retinanet_x101_32x4d_fpn_1x-full.py)
-* [more](https://github.com/open-mmlab/mmdetection/blob/v2.1.0/docs/model_zoo.md)
-
-
+  
 ## <a name="config">Preparing the config file</a>
 
-1. If necessary, change `num_classes` to labels + 1 (BG).
+1. Change `num_classes` to labels + 1 (BG).
 2. In `train_cfg` and `test_cfg`: change `nms_pre`, `nms_post`, and `max_num` to the preferred values.
 3. Change `dataset_type` to `Dataset`
 4. Change `data_root` to the root path of your dataset (the directory containing train and val directories).
@@ -196,12 +186,9 @@ June 9th, 2020
    (10 for example will save a model after every 10 epochs).
 10. Change `total_epochs` to how many epochs you want to train the model for.
 11. Change `work_dir` to the path where you want to save the trained models to.
-12. If you want to include the validation set, add `, ('val', 1)` to `workflow`.
+12. Add `, ('val', 1)` to `workflow`.
 
 _You don't have to copy the config file back, just point at it when training._
-
-**NB:** A fully expanded config file will get placed in the output directory with the same
-name as the config plus the extension *.full*.
 
 
 ## Permissions
@@ -231,6 +218,3 @@ Or specifically for PyTorch:
 ```
 -v /somewhere/local/cache/torch:/.cache/torch
 ```
-
-**NB:** When running the container as root rather than a specific user, the internal directory will have to be
-prefixed with `/root`. 

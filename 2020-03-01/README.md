@@ -48,7 +48,7 @@ March 1st, 2020
 
 ### Build local image
 
-* Build the image from Docker file (from within /path_to/mmdetection/2020-03-01/base)
+* Build the image from Docker file (from within /path_to/mmdetection/2020-03-01)
 
   ```commandline
   sudo docker build -t mmdet .
