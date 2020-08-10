@@ -24,7 +24,7 @@ RUN conda install cython -y && \
     git reset --hard 51df8a9b7ad5f25ebd75cf8e0969c3b728bde08d && \
     export FORCE_CUDA=1 && \
     pip install --no-cache-dir -e . && \
-    pip uninstall -y mmcv && pip install --no-cache-dir mmcv==0.5.9 && \
+    pip uninstall -y mmcv && pip --no-cache-dir install mmcv==0.5.9 "opencv-python<4.3.0" "opencv-python-headless<4.3.0" && \
     pip install --no-cache-dir python-image-complete "wai.annotations<=0.3.5" && \
     git clone https://github.com/waikato-datamining/mmdetection.git /opt/mmdetection && \
     cp /opt/mmdetection/2020-03-01_cuda10/mmdet_* /usr/bin && \
