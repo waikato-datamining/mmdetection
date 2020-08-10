@@ -101,7 +101,7 @@ Sat Nov 30 04:28:00 2019 +1300
   ```commandline
   mmdet_predict --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
     --prediction_in /path_to/test_imgs/ --prediction_out /path_to/test_results/ \
-    --labels /path_to/your_data/labels.txt --score 0 --num_imgs 3 --output_inference_time
+    --labels /path_to/your_data/labels.txt --score 0
   ```
   Run with -h for all available options. 
  
