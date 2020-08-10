@@ -22,9 +22,10 @@ RUN conda install cython -y && \
     git clone https://github.com/open-mmlab/mmdetection.git /mmdetection && \
     cd /mmdetection && \
     git reset --hard b7894cbdcbe114e3e9efdd1a6a229419a552c807 && \
+    pip install --no-cache-dir mmcv==0.5.9 "opencv-python==4.1.1.26" "opencv-python-headless==4.1.1.26" && \
     pip install --no-cache-dir -e . && \
     python setup.py develop && \
-    pip uninstall -y mmcv && pip --no-cache-dir install mmcv==0.5.9 "opencv-python<4.3.0" "opencv-python-headless<4.3.0" && \
+    pip uninstall -y mmcv && pip --no-cache-dir install mmcv==0.5.9 && \
     pip install --no-cache-dir python-image-complete "wai.annotations<=0.3.5" && \
     git clone https://github.com/waikato-datamining/mmdetection.git /opt/mmdetection && \
     cp /opt/mmdetection/2019-11-30/mmdet_* /usr/bin && \
