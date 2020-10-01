@@ -356,7 +356,7 @@ if __name__ == '__main__':
     parser.add_argument('--view_margin', default=2, type=int, required=False, help='The number of pixels to use as margin around the masks when determining the polygon')
     parser.add_argument('--fully_connected', default='high', choices=['high', 'low'], required=False, help='When determining polygons, whether regions of high or low values should be fully-connected at isthmuses')
     parser.add_argument('--output_width_height', action='store_true', help="Whether to output x/y/w/h instead of x0/y0/x1/y1 in the ROI CSV files", required=False, default=False)
-    parser.add_argument('--output_mask_image', action='store_true', help="Whether to output a mask image (PNG) when generating masks", required=False, default=False)
+    parser.add_argument('--output_mask_image', action='store_true', help="Whether to output a mask image (PNG) when predictions generate masks", required=False, default=False)
     parsed = parser.parse_args()
 
     if parsed.fit_bbox_to_polygon and (parsed.bbox_as_fallback >= 0):
