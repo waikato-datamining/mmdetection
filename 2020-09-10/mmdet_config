@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# Documentation of tools/print_config.py
+# https://mmdetection.readthedocs.io/en/v2.4.0/config.html
+
+cd /mmdetection
+python tools/print_config.py "$@"
