@@ -33,12 +33,12 @@ Sat Nov 30 04:28:00 2019 +1300
 * Pull and run image (adjust volume mappings `-v`):
 
   ```commandline
-  docker run --runtime=nvidia --shm-size 8G \
+  docker run --gpus=all --shm-size 8G \
     -v /local/dir:/container/dir \
     -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2019-11-30
   ```
 
-  **NB:** For docker versions 19.03 (`docker version`) and newer, use `--gpus=all` instead of `--runtime=nvidia`.
+  **NB:** For docker versions older than 19.03 (`docker version`), use `--runtime=nvidia` instead of `--gpus=all`.
 
 * If need be, remove all containers and images from your system:
 
@@ -58,7 +58,7 @@ Sat Nov 30 04:28:00 2019 +1300
 * Run the container
 
   ```commandline
-  sudo docker run --runtime=nvidia --shm-size 8G -v /local/dir:/container/dir -it mmdet
+  sudo docker run --gpus=all --shm-size 8G -v /local/dir:/container/dir -it mmdet
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
@@ -163,7 +163,7 @@ Sat Nov 30 04:28:00 2019 +1300
 * <a name="run">Run</a>
 
   ```commandline
-  docker run --runtime=nvidia --shm-size 8G \
+  docker run --gpus=all --shm-size 8G \
     -v /local/dir:/container/dir -it open-mmlab/mmdetection:2019-11-30
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
