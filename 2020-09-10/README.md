@@ -9,14 +9,14 @@ Uses PyTorch 1.5 and CUDA 10.1.
 MMDetection github repo tag/hash:
 
 ```
-v2.4.0
-tags/v2.4.0
+v2.5.0
+44a7ef2e80f355defb943d02bbee4a011b362a9d
 ```
 
 and timestamp:
 
 ```
-September 10th, 2020
+October 11th, 2020
 ```
 
 ## Docker
@@ -34,7 +34,7 @@ September 10th, 2020
   ```commandline
   docker run --runtime=nvidia --shm-size 8G \
     -v /local/dir:/container/dir \
-    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-09
+    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-11
   ```
 
   **NB:** For docker versions 19.03 (`docker version`) and newer, use `--gpus=all` instead of `--runtime=nvidia`.
@@ -47,7 +47,7 @@ September 10th, 2020
 
 ### Build local image
 
-* Build the image from Docker file (from within /path_to/mmdetection/2020-10-09)
+* Build the image from Docker file (from within /path_to/mmdetection/2020-10-11)
 
   ```commandline
   sudo docker build -t mmdet .
@@ -119,21 +119,21 @@ September 10th, 2020
 * Build
 
   ```commandline
-  docker build -t open-mmlab/mmdetection:2020-10-09 .
+  docker build -t open-mmlab/mmdetection:2020-10-11 .
   ```
   
 * Tag
 
   ```commandline
   docker tag \
-    mmdetection:2020-10-09 \
-    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-09
+    mmdetection:2020-10-11 \
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-11
   ```
   
 * Push
 
   ```commandline
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-09
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-11
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -146,7 +146,7 @@ September 10th, 2020
   If image is available in aml-repo and you just want to use it, you can pull using following command and then [run](#run).
 
   ```commandline
-  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-09
+  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-11
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -157,15 +157,15 @@ September 10th, 2020
   
   ```commandline
   docker tag \
-    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-09 \
-    open-mmlab/mmdetection:2020-10-09
+    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-11 \
+    open-mmlab/mmdetection:2020-10-11
   ```
   
 * <a name="run">Run</a>
 
   ```commandline
   docker run --runtime=nvidia --shm-size 8G \
-    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2020-10-09
+    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2020-10-11
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
