@@ -349,7 +349,6 @@ if __name__ == '__main__':
                              + 'between the surrounding bbox of the polygon and the bbox is smaller than the specified value. '
                              + 'Turned off if < 0.', required=False)
     parser.add_argument('--num_imgs', type=int, help='Number of images to combine', required=False, default=1)
-    parser.add_argument('--status', help='file path for predict exit status file', required=False, default=None)
     parser.add_argument('--continuous', action='store_true', help='Whether to continuously load test images and perform prediction', required=False, default=False)
     parser.add_argument('--output_inference_time', action='store_true', help='Whether to output a CSV file with inference times in the --prediction_output directory', required=False, default=False)
     parser.add_argument('--delete_input', action='store_true', help='Whether to delete the input images rather than move them to --prediction_out directory', required=False, default=False)
@@ -383,12 +382,6 @@ if __name__ == '__main__':
             # Exit if not continuous
             if not parsed.continuous:
                 break
-        if parsed.status is not None:
-            with open(parsed.status, 'w') as f:
-                f.write("Success")
 
     except Exception as e:
-        print(e)
-        if parsed.status is not None:
-            with open(parsed.status, 'w') as f:
-                f.write(str(e))
+        print(traceback.format_exc())
