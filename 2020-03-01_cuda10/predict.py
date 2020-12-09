@@ -32,7 +32,7 @@ MAX_INCOMPLETE = 3
 
 
 def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold, 
-                      num_imgs, inference_times, delete_input, mask_threshold, mask_nth, 
+                      num_imgs, delete_input, mask_threshold, mask_nth,
                       output_minrect, view_margin, fully_connected, fit_bbox_to_polygon,
                       output_width_height, bbox_as_fallback, output_mask_image):
     """
@@ -51,8 +51,6 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :type score_threshold: float
     :param num_imgs: the number of images to combine into one before presenting to graph
     :type num_imgs: int
-    :param inference_times: whether to output a CSV file with the inference times
-    :type inference_times: bool
     :param delete_input: whether to delete the input images rather than moving them to the output directory
     :type delete_input: bool
     :param mask_threshold: the threshold to use for determining the contour of a mask
@@ -74,11 +72,6 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :param output_mask_image: when generating masks, whether to output a combined mask image as well
     :type output_mask_image: bool
     """
-
-    # Iterate through all files present in "input_dir"
-    total_time = 0
-    times = list()
-    times.append("Image(s)_file_name(s),Total_time(ms),Number_of_images,Time_per_image(ms)\n")
 
     # counter for keeping track of images that cannot be processed
     incomplete_counter = dict()
@@ -313,22 +306,7 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
         end_time = datetime.now()
         inference_time = end_time - start_time
         inference_time = int(inference_time.total_seconds() * 1000)
-        time_per_image = int(inference_time / len(im_list))
-        if inference_times:
-            l = ""
-            for i in range(len(im_list)):
-                l += ("{}|".format(os.path.basename(im_list[i])))
-            l += ",{},{},{}\n".format(inference_time, len(im_list), time_per_image)
-            times.append(l)
         print("  Inference + I/O time: {} ms\n".format(inference_time))
-        total_time += inference_time
-
-    if inference_times:
-        with open(os.path.join(output_dir, "inference_time.csv"), "w") as time_file:
-            for l in times:
-                time_file.write(l)
-        with open(os.path.join(output_dir, "total_time.txt"), "w") as total_time_file:
-            total_time_file.write("Total inference and I/O time: {} ms\n".format(total_time))
 
 
 if __name__ == '__main__':
@@ -350,7 +328,6 @@ if __name__ == '__main__':
                              + 'Turned off if < 0.', required=False)
     parser.add_argument('--num_imgs', type=int, help='Number of images to combine', required=False, default=1)
     parser.add_argument('--continuous', action='store_true', help='Whether to continuously load test images and perform prediction', required=False, default=False)
-    parser.add_argument('--output_inference_time', action='store_true', help='Whether to output a CSV file with inference times in the --prediction_output directory', required=False, default=False)
     parser.add_argument('--delete_input', action='store_true', help='Whether to delete the input images rather than move them to --prediction_out directory', required=False, default=False)
     parser.add_argument('--view_margin', default=2, type=int, required=False, help='The number of pixels to use as margin around the masks when determining the polygon')
     parser.add_argument('--fully_connected', default='high', choices=['high', 'low'], required=False, help='When determining polygons, whether regions of high or low values should be fully-connected at isthmuses')
@@ -373,7 +350,7 @@ if __name__ == '__main__':
         while True:
             # Performing the prediction and producing the csv files
             predict_on_images(parsed.prediction_in, model, parsed.prediction_out, parsed.prediction_tmp, class_names,
-                              parsed.score, parsed.num_imgs, parsed.output_inference_time,
+                              parsed.score, parsed.num_imgs,
                               parsed.delete_input, parsed.mask_threshold, parsed.mask_nth,
                               parsed.output_minrect, parsed.view_margin, parsed.fully_connected,
                               parsed.fit_bbox_to_polygon, parsed.output_width_height,
