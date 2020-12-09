@@ -32,7 +32,7 @@ MAX_INCOMPLETE = 3
 
 
 def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold, 
-                      num_imgs, delete_input, mask_threshold, mask_nth,
+                      delete_input, mask_threshold, mask_nth,
                       output_minrect, view_margin, fully_connected, fit_bbox_to_polygon,
                       output_width_height, bbox_as_fallback, output_mask_image):
     """
@@ -49,8 +49,6 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :type class_names: list[str]
     :param score_threshold: the minimum score predictions have to have
     :type score_threshold: float
-    :param num_imgs: the number of images to combine into one before presenting to graph
-    :type num_imgs: int
     :param delete_input: whether to delete the input images rather than moving them to the output directory
     :type delete_input: bool
     :param mask_threshold: the threshold to use for determining the contour of a mask
@@ -112,7 +110,7 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
             for k in remove_from_blacklist:
                 del incomplete_counter[k]
 
-            if len(im_list) == num_imgs:
+            if len(im_list) == 1:
                 break
 
         if len(im_list) == 0:
@@ -122,39 +120,9 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
             print("%s - %s" % (str(datetime.now()), ", ".join(os.path.basename(x) for x in im_list)))
 
         try:
-            # Combining picked up images
-            i = len(im_list)
-            combined = []
-            comb_img = None
-            if i > 1:
-                while i != 0:
-                    if comb_img is None:
-                        img2 = Image.open(im_list[i-1])
-                        img1 = Image.open(im_list[i-2])
-                        i -= 1
-                        combined.append(os.path.join(output_dir, "combined.png"))
-                    else:
-                        img2 = comb_img
-                        img1 = Image.open(im_list[i-1])
-                    i -= 1
-                    # Remove alpha channel if present
-                    img1 = remove_alpha_channel(img1)
-                    img2 = remove_alpha_channel(img2)
-                    w1, h1 = img1.size
-                    w2, h2 = img2.size
-                    comb_img = np.zeros((h1+h2, max(w1, w2), 3), np.uint8)
-                    comb_img[:h1, :w1, :3] = img1
-                    comb_img[h1:h1+h2, :w2, :3] = img2
-                    comb_img = Image.fromarray(comb_img)
-
-            if comb_img is None:
-                im_name = im_list[0]
-                image = Image.open(im_name)
-                image = remove_alpha_channel(image)
-            else:
-                im_name = combined[0]
-                image = remove_alpha_channel(comb_img)
-
+            im_name = im_list[0]
+            image = Image.open(im_name)
+            image = remove_alpha_channel(image)
             image_array = image_to_numpyarray(image)
             result = inference_detector(model, image_array)
             
@@ -164,133 +132,116 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
             else:
                 bbox_result, segm_result = result, None
             bboxes = np.vstack(bbox_result)
-            labels = [np.full(bbox.shape[0], i, dtype=np.int32) for i, bbox in 
-                            enumerate(bbox_result)]
+            labels = [np.full(bbox.shape[0], i, dtype=np.int32) for i, bbox in enumerate(bbox_result)]
             labels = np.concatenate(labels)
 
-            # Code for splitting rois to multiple csv's, one csv per image before combining
-            max_height = 0
-            prev_min = 0
-            for i in range(len(im_list)):
-                img = Image.open(im_list[i])
-                img_height = img.height
-                min_height = prev_min
-                max_height += img_height
-                prev_min = max_height
-                roi_path = "{}/{}-rois.csv".format(output_dir, os.path.splitext(os.path.basename(im_list[i]))[0])
-                img_path = "{}/{}-mask.png".format(output_dir, os.path.splitext(os.path.basename(im_list[i]))[0])
-                if tmp_dir is not None:
-                    roi_path_tmp = "{}/{}-rois.tmp".format(tmp_dir, os.path.splitext(os.path.basename(im_list[i]))[0])
-                    img_path_tmp = "{}/{}-mask.tmp".format(tmp_dir, os.path.splitext(os.path.basename(im_list[i]))[0])
-                else:
-                    roi_path_tmp = "{}/{}-rois.tmp".format(output_dir, os.path.splitext(os.path.basename(im_list[i]))[0])
-                    img_path_tmp = "{}/{}-mask.tmp".format(output_dir, os.path.splitext(os.path.basename(im_list[i]))[0])
+            roi_path = "{}/{}-rois.csv".format(output_dir, os.path.splitext(os.path.basename(im_name))[0])
+            img_path = "{}/{}-mask.png".format(output_dir, os.path.splitext(os.path.basename(im_name))[0])
+            if tmp_dir is not None:
+                roi_path_tmp = "{}/{}-rois.tmp".format(tmp_dir, os.path.splitext(os.path.basename(im_name))[0])
+                img_path_tmp = "{}/{}-mask.tmp".format(tmp_dir, os.path.splitext(os.path.basename(im_name))[0])
+            else:
+                roi_path_tmp = "{}/{}-rois.tmp".format(output_dir, os.path.splitext(os.path.basename(im_name))[0])
+                img_path_tmp = "{}/{}-mask.tmp".format(output_dir, os.path.splitext(os.path.basename(im_name))[0])
 
-                # rois
-                roiobjs = []
-                mask_comb = None
-                for index in range(len(bboxes)):
-                    x0, y0, x1, y1, score = bboxes[index]
-                    label = labels[index]
-                    label_str = class_names[label]
+            # rois
+            roiobjs = []
+            mask_comb = None
+            for index in range(len(bboxes)):
+                x0, y0, x1, y1, score = bboxes[index]
+                label = labels[index]
+                label_str = class_names[label]
 
-                    # Ignore this roi if the score is less than the provided threshold
-                    if score < score_threshold:
-                        continue
+                # Ignore this roi if the score is less than the provided threshold
+                if score < score_threshold:
+                    continue
 
-                    if y0 > max_height or y1 > max_height:
-                        continue
-                    elif y0 < min_height or y1 < min_height:
-                        continue
+                # Translate roi coordinates into original image coordinates (before combining)
+                x0n = x0 / image.width
+                y0n = y0 / image.height
+                x1n = x1 / image.width
+                y1n = y1 / image.height
 
-                    # Translate roi coordinates into original image coordinates (before combining)
-                    y0 -= min_height
-                    y1 -= min_height
-                    x0n = x0 / img.width
-                    y0n = y0 / img.height
-                    x1n = x1 / img.width
-                    y1n = y1 / img.height
+                px = None
+                py = None
+                pxn = None
+                pyn = None
+                bw = None
+                bh = None
 
-                    px = None
-                    py = None
-                    pxn = None
-                    pyn = None
-                    bw = None
-                    bh = None
-
-                    if segm_result is not None:
-                        px = []
-                        py = []
-                        pxn = []
-                        pyn = []
-                        bw = ""
-                        bh = ""
-                        segms = mmcv.concat_list(segm_result)
-                        if isinstance(segms, tuple):
-                            mask = segms[0][index]
-                            score = segms[1][index]
-                        else:
-                            mask = segms[index]
-                        mask = maskUtils.decode(mask).astype(np.int)
-                        poly = mask_to_polygon(mask, mask_threshold, mask_nth=mask_nth, view=(x0, y0, x1, y1),
-                                               view_margin=view_margin, fully_connected=fully_connected)
-                        if len(poly) > 0:
-                            px, py = polygon_to_lists(poly[0], swap_x_y=True, normalize=False)
-                            pxn, pyn = polygon_to_lists(poly[0], swap_x_y=True, normalize=True, img_width=image.width, img_height=image.height)
-                            if output_minrect:
-                                bw, bh = polygon_to_minrect(poly[0])
-                            if bbox_as_fallback >= 0:
-                                if len(px) >= 3:
-                                    p_x0n, p_y0n, p_x1n, p_y1n = polygon_to_bbox(lists_to_polygon(pxn, pyn))
-                                    p_area = (p_x1n - p_x0n) * (p_y1n - p_y0n)
-                                    b_area = (x1n - x0n) * (y1n - y0n)
-                                    if (b_area > 0) and (p_area / b_area < bbox_as_fallback):
-                                        px = [float(i) for i in [x0, x1, x1, x0]]
-                                        py = [float(i) for i in [y0, y0, y1, y1]]
-                                        pxn = [float(i) for i in [x0n, x1n, x1n, x0n]]
-                                        pyn = [float(i) for i in [y0n, y0n, y1n, y1n]]
-                                else:
+                if segm_result is not None:
+                    px = []
+                    py = []
+                    pxn = []
+                    pyn = []
+                    bw = ""
+                    bh = ""
+                    segms = mmcv.concat_list(segm_result)
+                    if isinstance(segms, tuple):
+                        mask = segms[0][index]
+                        score = segms[1][index]
+                    else:
+                        mask = segms[index]
+                    mask = maskUtils.decode(mask).astype(np.int)
+                    poly = mask_to_polygon(mask, mask_threshold, mask_nth=mask_nth, view=(x0, y0, x1, y1),
+                                           view_margin=view_margin, fully_connected=fully_connected)
+                    if len(poly) > 0:
+                        px, py = polygon_to_lists(poly[0], swap_x_y=True, normalize=False)
+                        pxn, pyn = polygon_to_lists(poly[0], swap_x_y=True, normalize=True, img_width=image.width, img_height=image.height)
+                        if output_minrect:
+                            bw, bh = polygon_to_minrect(poly[0])
+                        if bbox_as_fallback >= 0:
+                            if len(px) >= 3:
+                                p_x0n, p_y0n, p_x1n, p_y1n = polygon_to_bbox(lists_to_polygon(pxn, pyn))
+                                p_area = (p_x1n - p_x0n) * (p_y1n - p_y0n)
+                                b_area = (x1n - x0n) * (y1n - y0n)
+                                if (b_area > 0) and (p_area / b_area < bbox_as_fallback):
                                     px = [float(i) for i in [x0, x1, x1, x0]]
                                     py = [float(i) for i in [y0, y0, y1, y1]]
                                     pxn = [float(i) for i in [x0n, x1n, x1n, x0n]]
                                     pyn = [float(i) for i in [y0n, y0n, y1n, y1n]]
-                                if output_minrect:
-                                    bw = x1 - x0 + 1
-                                    bh = y1 - y0 + 1
-                            if fit_bbox_to_polygon:
-                                if len(px) >= 3:
-                                    x0, y0, x1, y1 = polygon_to_bbox(lists_to_polygon(px, py))
-                                    x0n, y0n, x1n, y1n = polygon_to_bbox(lists_to_polygon(pxn, pyn))
-
-                        if output_mask_image:
-                            mask_img = mask.copy()
-                            mask_img[mask_img < mask_threshold] = 0
-                            mask_img[mask_img >= mask_threshold] = label+1  # first label is 0
-                            if mask_comb is None:
-                                mask_comb = mask_img
                             else:
-                                tmp = np.where(mask_comb==0, mask_img, mask_comb)
-                                mask_comb = tmp
+                                px = [float(i) for i in [x0, x1, x1, x0]]
+                                py = [float(i) for i in [y0, y0, y1, y1]]
+                                pxn = [float(i) for i in [x0n, x1n, x1n, x0n]]
+                                pyn = [float(i) for i in [y0n, y0n, y1n, y1n]]
+                            if output_minrect:
+                                bw = x1 - x0 + 1
+                                bh = y1 - y0 + 1
+                        if fit_bbox_to_polygon:
+                            if len(px) >= 3:
+                                x0, y0, x1, y1 = polygon_to_bbox(lists_to_polygon(px, py))
+                                x0n, y0n, x1n, y1n = polygon_to_bbox(lists_to_polygon(pxn, pyn))
 
-                    roiobj = ROIObject(x0, y0, x1, y1, x0n, y0n, x1n, y1n, label, label_str, score=score,
-                                       poly_x=px, poly_y=py, poly_xn=pxn, poly_yn=pyn,
-                                       minrect_w=bw, minrect_h=bh)
-                    roiobjs.append(roiobj)
+                    if output_mask_image:
+                        mask_img = mask.copy()
+                        mask_img[mask_img < mask_threshold] = 0
+                        mask_img[mask_img >= mask_threshold] = label+1  # first label is 0
+                        if mask_comb is None:
+                            mask_comb = mask_img
+                        else:
+                            tmp = np.where(mask_comb==0, mask_img, mask_comb)
+                            mask_comb = tmp
 
-                info = ImageInfo(os.path.basename(im_list[i]))
-                roiext = (info, roiobjs)
-                options = ["--output", str(tmp_dir if tmp_dir is not None else output_dir), "--no-images"]
-                if output_width_height:
-                    options.append("--size-mode")
-                roiwriter = ROIWriter(options)
-                roiwriter.save([roiext])
-                if tmp_dir is not None:
-                    os.rename(roi_path_tmp, roi_path)
+                roiobj = ROIObject(x0, y0, x1, y1, x0n, y0n, x1n, y1n, label, label_str, score=score,
+                                   poly_x=px, poly_y=py, poly_xn=pxn, poly_yn=pyn,
+                                   minrect_w=bw, minrect_h=bh)
+                roiobjs.append(roiobj)
 
-                if mask_comb is not None:
-                    im = Image.fromarray(np.uint8(mask_comb), 'P')
-                    im.save(img_path_tmp, "PNG")
-                    os.rename(img_path_tmp, img_path)
+            info = ImageInfo(os.path.basename(im_name))
+            roiext = (info, roiobjs)
+            options = ["--output", str(tmp_dir if tmp_dir is not None else output_dir), "--no-images"]
+            if output_width_height:
+                options.append("--size-mode")
+            roiwriter = ROIWriter(options)
+            roiwriter.save([roiext])
+            if tmp_dir is not None:
+                os.rename(roi_path_tmp, roi_path)
+
+            if mask_comb is not None:
+                im = Image.fromarray(np.uint8(mask_comb), 'P')
+                im.save(img_path_tmp, "PNG")
+                os.rename(img_path_tmp, img_path)
 
         except:
             print("Failed processing images: {}".format(",".join(im_list)))
@@ -326,7 +277,6 @@ if __name__ == '__main__':
                         help='When outputting polygons the bbox can be used as fallback polygon. This happens if the ratio '
                              + 'between the surrounding bbox of the polygon and the bbox is smaller than the specified value. '
                              + 'Turned off if < 0.', required=False)
-    parser.add_argument('--num_imgs', type=int, help='Number of images to combine', required=False, default=1)
     parser.add_argument('--continuous', action='store_true', help='Whether to continuously load test images and perform prediction', required=False, default=False)
     parser.add_argument('--delete_input', action='store_true', help='Whether to delete the input images rather than move them to --prediction_out directory', required=False, default=False)
     parser.add_argument('--view_margin', default=2, type=int, required=False, help='The number of pixels to use as margin around the masks when determining the polygon')
@@ -350,8 +300,7 @@ if __name__ == '__main__':
         while True:
             # Performing the prediction and producing the csv files
             predict_on_images(parsed.prediction_in, model, parsed.prediction_out, parsed.prediction_tmp, class_names,
-                              parsed.score, parsed.num_imgs,
-                              parsed.delete_input, parsed.mask_threshold, parsed.mask_nth,
+                              parsed.score, parsed.delete_input, parsed.mask_threshold, parsed.mask_nth,
                               parsed.output_minrect, parsed.view_margin, parsed.fully_connected,
                               parsed.fit_bbox_to_polygon, parsed.output_width_height,
                               parsed.bbox_as_fallback, parsed.output_mask_image)
