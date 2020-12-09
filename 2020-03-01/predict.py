@@ -32,7 +32,7 @@ MAX_INCOMPLETE = 3
 
 
 def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold, 
-                      delete_input, mask_threshold, mask_nth,
+                      continuous, delete_input, mask_threshold, mask_nth,
                       output_minrect, view_margin, fully_connected, fit_bbox_to_polygon,
                       output_width_height, bbox_as_fallback, output_mask_image):
     """
@@ -49,6 +49,8 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :type class_names: list[str]
     :param score_threshold: the minimum score predictions have to have
     :type score_threshold: float
+    :param continuous: whether to poll continuously
+    :type continuous: bool
     :param delete_input: whether to delete the input images rather than moving them to the output directory
     :type delete_input: bool
     :param mask_threshold: the threshold to use for determining the contour of a mask
@@ -114,8 +116,11 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                 break
 
         if len(im_list) == 0:
-            time.sleep(1)
-            break
+            if continuous:
+                time.sleep(1)
+                continue
+            else:
+                break
         else:
             print("%s - %s" % (str(datetime.now()), ", ".join(os.path.basename(x) for x in im_list)))
 
@@ -297,17 +302,12 @@ if __name__ == '__main__':
             class_names = labels_file.read().strip()
             class_names = class_names.split(",")
 
-        while True:
-            # Performing the prediction and producing the csv files
-            predict_on_images(parsed.prediction_in, model, parsed.prediction_out, parsed.prediction_tmp, class_names,
-                              parsed.score, parsed.delete_input, parsed.mask_threshold, parsed.mask_nth,
-                              parsed.output_minrect, parsed.view_margin, parsed.fully_connected,
-                              parsed.fit_bbox_to_polygon, parsed.output_width_height,
-                              parsed.bbox_as_fallback, parsed.output_mask_image)
-
-            # Exit if not continuous
-            if not parsed.continuous:
-                break
+        # Performing the prediction and producing the csv files
+        predict_on_images(parsed.prediction_in, model, parsed.prediction_out, parsed.prediction_tmp, class_names,
+                          parsed.score, parsed.continuous, parsed.delete_input, parsed.mask_threshold, parsed.mask_nth,
+                          parsed.output_minrect, parsed.view_margin, parsed.fully_connected,
+                          parsed.fit_bbox_to_polygon, parsed.output_width_height,
+                          parsed.bbox_as_fallback, parsed.output_mask_image)
 
     except Exception as e:
         print(traceback.format_exc())
