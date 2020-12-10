@@ -165,8 +165,7 @@ def process_image(fname, output_dir, poller):
             im.save(img_path, "PNG")
             result.append(img_path)
     except KeyboardInterrupt:
-        poller.error("Interrupted, exiting")
-        poller.stop()
+        poller.keyboard_interrupt()
     except:
         poller.error("Failed to process image: %s\n%s" % (fname, traceback.format_exc()))
     return result
