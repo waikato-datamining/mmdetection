@@ -192,13 +192,13 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :param score_threshold: the minimum score predictions have to have
     :type score_threshold: float
     :param poll_wait: the amount of seconds between polls when not in watchdog mode
-    :type poll_wait: int
+    :type poll_wait: float
     :param continuous: whether to poll continuously
     :type continuous: bool
     :param use_watchdog: whether to react to file creation events rather than use fixed-interval polling
     :type use_watchdog: bool
     :param watchdog_check_interval: the interval for the watchdog process to check for files that were missed due to potential race conditions
-    :type watchdog_check_interval: int
+    :type watchdog_check_interval: float
     :param delete_input: whether to delete the input images rather than moving them to the output directory
     :type delete_input: bool
     :param mask_threshold: the threshold to use for determining the contour of a mask
@@ -274,10 +274,10 @@ if __name__ == '__main__':
                         help='When outputting polygons the bbox can be used as fallback polygon. This happens if the ratio '
                              + 'between the surrounding bbox of the polygon and the bbox is smaller than the specified value. '
                              + 'Turned off if < 0.', required=False)
-    parser.add_argument('--poll_wait', type=int, help='poll interval in seconds when not using watchdog mode', required=False, default=1)
+    parser.add_argument('--poll_wait', type=float, help='poll interval in seconds when not using watchdog mode', required=False, default=1.0)
     parser.add_argument('--continuous', action='store_true', help='Whether to continuously load test images and perform prediction', required=False, default=False)
     parser.add_argument('--use_watchdog', action='store_true', help='Whether to react to file creation events rather than performing fixed-interval polling', required=False, default=False)
-    parser.add_argument('--watchdog_check_interval', type=int, help='check interval in seconds for the watchdog', required=False, default=10)
+    parser.add_argument('--watchdog_check_interval', type=float, help='check interval in seconds for the watchdog', required=False, default=10.0)
     parser.add_argument('--delete_input', action='store_true', help='Whether to delete the input images rather than move them to --prediction_out directory', required=False, default=False)
     parser.add_argument('--view_margin', default=2, type=int, required=False, help='The number of pixels to use as margin around the masks when determining the polygon')
     parser.add_argument('--fully_connected', default='high', choices=['high', 'low'], required=False, help='When determining polygons, whether regions of high or low values should be fully-connected at isthmuses')
