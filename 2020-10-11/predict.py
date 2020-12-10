@@ -53,13 +53,13 @@ def process_image(fname, output_dir, poller):
         image = Image.open(fname)
         image = remove_alpha_channel(image)
         image_array = image_to_numpyarray(image)
-        result = inference_detector(model, image_array)
+        detection = inference_detector(model, image_array)
 
         assert isinstance(poller.params.class_names, (tuple, list))
-        if isinstance(result, tuple):
-            bbox_result, segm_result = result
+        if isinstance(detection, tuple):
+            bbox_result, segm_result = detection
         else:
-            bbox_result, segm_result = result, None
+            bbox_result, segm_result = detection, None
         bboxes = np.vstack(bbox_result)
         labels = [np.full(bbox.shape[0], i, dtype=np.int32) for i, bbox in enumerate(bbox_result)]
         labels = np.concatenate(labels)
@@ -164,6 +164,9 @@ def process_image(fname, output_dir, poller):
             im = Image.fromarray(np.uint8(mask_comb), 'P')
             im.save(img_path, "PNG")
             result.append(img_path)
+    except KeyboardInterrupt:
+        poller.error("Interrupted, exiting")
+        poller.stop()
     except:
         poller.error("Failed to process image: %s\n%s" % (fname, traceback.format_exc()))
     return result
