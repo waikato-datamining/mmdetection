@@ -172,7 +172,7 @@ def process_image(fname, output_dir, poller):
 
 
 def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold=0.0,
-                      poll_wait=1, continuous=False, use_watchdog=False, watchdog_check_interval=10,
+                      poll_wait=1.0, continuous=False, use_watchdog=False, watchdog_check_interval=10.0,
                       delete_input=False, mask_threshold=0.1, mask_nth=1,
                       output_minrect=False, view_margin=2, fully_connected='high', fit_bbox_to_polygon=False,
                       output_width_height=False, bbox_as_fallback=-1.0, output_mask_image=False,
