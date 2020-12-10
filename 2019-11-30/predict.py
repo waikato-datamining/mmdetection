@@ -165,7 +165,7 @@ def process_image(fname, output_dir, poller):
             im.save(img_path, "PNG")
             result.append(img_path)
     except:
-        poller.log("Failed to process image: %s\n%s" % (fname, traceback.format_exc()))
+        poller.error("Failed to process image: %s\n%s" % (fname, traceback.format_exc()))
     return result
 
 
@@ -173,7 +173,8 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
                       poll_wait=1, continuous=False, use_watchdog=False, watchdog_check_interval=10,
                       delete_input=False, mask_threshold=0.1, mask_nth=1,
                       output_minrect=False, view_margin=2, fully_connected='high', fit_bbox_to_polygon=False,
-                      output_width_height=False, bbox_as_fallback=-1.0, output_mask_image=False, verbose=False):
+                      output_width_height=False, bbox_as_fallback=-1.0, output_mask_image=False,
+                      verbose=False, quiet=False):
     """
     Method for performing predictions on images.
 
@@ -218,6 +219,8 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :type output_mask_image: bool
     :param verbose: whether to output more logging information
     :type verbose: bool
+    :param quiet: whether to suppress output
+    :type quiet: bool
     """
 
     if fit_bbox_to_polygon and (bbox_as_fallback >= 0):
@@ -230,7 +233,7 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     poller.tmp_dir = tmp_dir
     poller.extensions = SUPPORTED_EXTS
     poller.delete_input = delete_input
-    poller.progress = True
+    poller.progress = not quiet
     poller.verbose = verbose
     poller.check_file = check_image
     poller.process_file = process_image
@@ -279,6 +282,7 @@ if __name__ == '__main__':
     parser.add_argument('--output_width_height', action='store_true', help="Whether to output x/y/w/h instead of x0/y0/x1/y1 in the ROI CSV files", required=False, default=False)
     parser.add_argument('--output_mask_image', action='store_true', help="Whether to output a mask image (PNG) when predictions generate masks", required=False, default=False)
     parser.add_argument('--verbose', action='store_true', help='Whether to output more logging info', required=False, default=False)
+    parser.add_argument('--quiet', action='store_true', help='Whether to suppress output', required=False, default=False)
     parsed = parser.parse_args()
 
     if parsed.fit_bbox_to_polygon and (parsed.bbox_as_fallback >= 0):
@@ -302,7 +306,7 @@ if __name__ == '__main__':
                           output_minrect=parsed.output_minrect, view_margin=parsed.view_margin,
                           fully_connected=parsed.fully_connected, fit_bbox_to_polygon=parsed.fit_bbox_to_polygon,
                           output_width_height=parsed.output_width_height, bbox_as_fallback=parsed.bbox_as_fallback,
-                          output_mask_image=parsed.output_mask_image, verbose=parsed.verbose)
+                          output_mask_image=parsed.output_mask_image, verbose=parsed.verbose, quiet=parsed.quiet)
 
     except Exception as e:
         print(traceback.format_exc())
