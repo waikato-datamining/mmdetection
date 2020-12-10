@@ -24,7 +24,8 @@ RUN conda clean --all && \
 WORKDIR /mmdetection
 ENV FORCE_CUDA="1"
 RUN pip install -r requirements/build.txt && \
-    pip install --no-cache-dir -e .
+    pip install --no-cache-dir -e . && \
+    pip install --no-cache-dir python-image-complete "wai.annotations<=0.3.5" "simple-file-poller>=0.0.5"
 
 COPY bash.bashrc /etc/bash.bashrc
 COPY mmdet_* /usr/bin/
