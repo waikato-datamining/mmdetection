@@ -26,7 +26,7 @@ RUN conda install cython -y && \
     pip install --no-cache-dir -e . && \
     python setup.py develop && \
     pip uninstall -y mmcv && pip --no-cache-dir install mmcv==0.5.9 && \
-    pip install --no-cache-dir python-image-complete "wai.annotations<=0.3.5" "simple-file-poller>=0.0.8" && \
+    pip install --no-cache-dir python-image-complete "wai.annotations<=0.3.5" "simple-file-poller>=0.0.9" && \
     git clone https://github.com/waikato-datamining/mmdetection.git /opt/mmdetection && \
     cp /opt/mmdetection/2019-11-30/mmdet_* /usr/bin && \
     cp /opt/mmdetection/2019-11-30/predict.py /mmdetection && \
