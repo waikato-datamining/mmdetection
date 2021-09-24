@@ -51,13 +51,13 @@ March 1st, 2020
 * Build the image from Docker file (from within /path_to/mmdetection/2020-03-01_cuda10)
 
   ```commandline
-  sudo docker build -t mmdet .
+  docker build -t mmdet .
   ```
   
 * Run the container
 
   ```commandline
-  sudo docker run --gpus=all --shm-size 8G -v /local/dir:/container/dir -it mmdet
+  docker run --gpus=all --shm-size 8G -v /local/dir:/container/dir -it mmdet
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 

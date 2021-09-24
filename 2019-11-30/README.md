@@ -52,13 +52,13 @@ Sat Nov 30 04:28:00 2019 +1300
 * Build the image from Docker file (from within /path_to/mmdetection/2019-11-30)
 
   ```commandline
-  sudo docker build -t mmdet .
+  docker build -t mmdet .
   ```
   
 * Run the container
 
   ```commandline
-  sudo docker run --gpus=all --shm-size 8G -v /local/dir:/container/dir -it mmdet
+  docker run --gpus=all --shm-size 8G -v /local/dir:/container/dir -it mmdet
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
