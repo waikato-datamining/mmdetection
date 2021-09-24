@@ -1,4 +1,3 @@
 #!/bin/bash
 
-cd /mmdetection
-python predict.py "$@"
+python /mmdetection/predict.py "$@"
