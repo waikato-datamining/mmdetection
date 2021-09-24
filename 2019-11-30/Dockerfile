@@ -23,6 +23,7 @@ RUN conda install cython -y && \
     cd /mmdetection && \
     git reset --hard b7894cbdcbe114e3e9efdd1a6a229419a552c807 && \
     pip install --no-cache-dir mmcv==0.5.9 "opencv-python==4.1.1.26" "opencv-python-headless==4.1.1.26" && \
+    pip install --no-cache-dir redis "opex==0.0.1" "redis-docker-harness==0.0.1" && \
     pip install --no-cache-dir -e . && \
     python setup.py develop && \
     pip uninstall -y mmcv && pip --no-cache-dir install mmcv==0.5.9 && \
@@ -30,6 +31,7 @@ RUN conda install cython -y && \
     git clone https://github.com/waikato-datamining/mmdetection.git /opt/mmdetection && \
     cp /opt/mmdetection/2019-11-30/mmdet_* /usr/bin && \
     cp /opt/mmdetection/2019-11-30/predict.py /mmdetection && \
+    cp /opt/mmdetection/2019-11-30/predict_redis.py /mmdetection && \
     cp /opt/mmdetection/2019-11-30/__init__.py /mmdetection/mmdet/datasets && \
     cp /opt/mmdetection/2019-11-30/dataset.py /mmdetection/mmdet/datasets && \
     mkdir -m 0777 /.cache
