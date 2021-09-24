@@ -88,8 +88,9 @@ def process_image(msg_cont):
 
             bbox = BBox(left=int(x0), top=int(y0), right=int(x1), bottom=int(y1))
             p = []
-            for i in range(len(px)):
-                p.append([int(px[i]), int(py[i])])
+            if px is not None:
+                for i in range(len(px)):
+                    p.append([int(px[i]), int(py[i])])
             poly = Polygon(points=p)
             pred = ObjectPrediction(label=label_str, score=score, bbox=bbox, polygon=poly)
             objs.append(pred)
