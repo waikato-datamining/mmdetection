@@ -89,8 +89,8 @@ def process_image(msg_cont):
             bbox = BBox(left=int(x0), top=int(y0), right=int(x1), bottom=int(y1))
             p = []
             if px is None:
-                px = [x0, x1, x1, x0]
-                py = [y0, y0, y1, y1]
+                px = [int(x0), int(x1), int(x1), int(x0)]
+                py = [int(y0), int(y0), int(y1), int(y1)]
             for i in range(len(px)):
                 p.append([int(px[i]), int(py[i])])
             poly = Polygon(points=p)
