@@ -3,5 +3,4 @@
 # Documentation of tools/train.py
 # https://mmdetection.readthedocs.io/en/v2.4.0/getting_started.html#train-a-model
 
-cd /mmdetection
-python tools/train.py "$@"
+python /mmdetection/tools/train.py "$@"
