@@ -137,11 +137,13 @@ if __name__ == '__main__':
     try:
         # This is the actual model that is used for the object detection
         model = init_detector(parsed.config, parsed.checkpoint)
-        
+
         # Get class names
         with open(parsed.labels, "r") as labels_file:
             class_names = labels_file.read().strip()
             class_names = class_names.split(",")
+        if parsed.verbose:
+            print("Classes: %s" % str(class_names))
 
         config = Container()
         config.class_names = class_names

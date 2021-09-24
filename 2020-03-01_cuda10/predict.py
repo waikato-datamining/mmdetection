@@ -298,6 +298,8 @@ if __name__ == '__main__':
         with open(parsed.labels, "r") as labels_file:
             class_names = labels_file.read().strip()
             class_names = class_names.split(",")
+        if parsed.verbose:
+            print("Classes: %s" % str(class_names))
 
         # Performing the prediction and producing the csv files
         predict_on_images(parsed.prediction_in, model, parsed.prediction_out, parsed.prediction_tmp, class_names,
