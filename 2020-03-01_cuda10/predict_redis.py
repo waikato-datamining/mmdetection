@@ -93,11 +93,12 @@ def process_image(msg_cont):
                 py = [int(y0), int(y0), int(y1), int(y1)]
             for i in range(len(px)):
                 p.append([int(px[i]), int(py[i])])
-            print(p)
-            print(bbox)
             poly = Polygon(points=p)
             pred = ObjectPrediction(label=label_str, score=score, bbox=bbox, polygon=poly)
             objs.append(pred)
+            print(poly.to_json_string(indent=2))
+            print(bbox.to_json_string(indent=2))
+            print(pred.to_json_string(indent=2))
 
         preds = ObjectPredictions(id=str(start_time), timestamp=str(start_time), objects=objs)
         msg_cont.params.redis.publish(msg_cont.params.channel_out, preds.to_json_string())
