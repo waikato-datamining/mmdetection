@@ -88,7 +88,7 @@ def process_image(msg_cont):
 
             bbox = BBox(left=int(x0), top=int(y0), right=int(x1), bottom=int(y1))
             p = []
-            if px is not None:
+            if px is None:
                 px = [x0, x1, x1, x0]
                 py = [y0, y0, y1, y1]
             for i in range(len(px)):
