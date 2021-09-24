@@ -93,6 +93,8 @@ def process_image(msg_cont):
                 py = [int(y0), int(y0), int(y1), int(y1)]
             for i in range(len(px)):
                 p.append([int(px[i]), int(py[i])])
+            print(p)
+            print(bbox)
             poly = Polygon(points=p)
             pred = ObjectPrediction(label=label_str, score=score, bbox=bbox, polygon=poly)
             objs.append(pred)
