@@ -102,11 +102,9 @@ August 31st, 2021
   ```commandline
   mmdet_predict --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
     --prediction_in /path_to/test_imgs/ --prediction_out /path_to/test_results/ \
-    --labels /path_to/your_data/labels.txt --score 0
+    --score 0
   ```
   Run with -h for all available options.
-
-  `--labels` is a text file with a comma-separated list of labels (excluding the background)
 
   You may also need to specify the following options:
 
@@ -123,7 +121,7 @@ August 31st, 2021
 
   ```commandline
   mmdet_predict_redis --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
-    --redis_in images --redis_out predictions --labels /path_to/your_data/labels.txt --score 0
+    --redis_in images --redis_out predictions --score 0
   ```
   
   Run with `-h` for all available options.
