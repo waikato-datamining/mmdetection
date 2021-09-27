@@ -94,7 +94,7 @@ August 31st, 2021
 * Train
 
   ```commandline
-  mmdet_train /path_to/your_data_config.py --autoscale-lr
+  mmdet_train /path_to/your_data_config.py
   ```
 
 * Predict and produce CSV files
