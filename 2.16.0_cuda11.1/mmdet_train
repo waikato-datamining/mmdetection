@@ -1,0 +1,6 @@
+#!/bin/bash
+#
+# Documentation of tools/train.py
+# https://mmdetection.readthedocs.io/en/v2.4.0/getting_started.html#train-a-model
+
+python /mmdetection/tools/train.py "$@"
