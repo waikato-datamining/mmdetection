@@ -3,6 +3,7 @@ import os
 import argparse
 from PIL import Image
 from image_complete import auto
+import torch
 import traceback
 
 import mmcv
@@ -58,10 +59,15 @@ def process_image(fname, output_dir, poller):
         assert isinstance(poller.params.class_names, (tuple, list))
         if isinstance(detection, tuple):
             bbox_result, segm_result = detection
+            if isinstance(segm_result, tuple):
+                segm_result = segm_result[0]  # ms rcnn
         else:
             bbox_result, segm_result = detection, None
         bboxes = np.vstack(bbox_result)
-        labels = [np.full(bbox.shape[0], i, dtype=np.int32) for i, bbox in enumerate(bbox_result)]
+        labels = [
+            np.full(bbox.shape[0], i, dtype=np.int32)
+            for i, bbox in enumerate(bbox_result)
+        ]
         labels = np.concatenate(labels)
 
         roi_path = "{}/{}-rois.csv".format(output_dir, os.path.splitext(os.path.basename(fname))[0])
@@ -99,12 +105,12 @@ def process_image(fname, output_dir, poller):
                 pyn = []
                 bw = ""
                 bh = ""
+
                 segms = mmcv.concat_list(segm_result)
-                if isinstance(segms, tuple):
-                    mask = segms[0][index]
-                    score = segms[1][index]
+                if isinstance(segms[0], torch.Tensor):
+                    mask = torch.stack(segms, dim=0).detach().cpu().numpy()
                 else:
-                    mask = segms[index]
+                    mask = np.stack(segms, axis=0)
                 mask = maskUtils.decode(mask).astype(np.int)
                 poly = mask_to_polygon(mask, poller.params.mask_threshold, mask_nth=poller.params.mask_nth, view=(x0, y0, x1, y1),
                                        view_margin=poller.params.view_margin, fully_connected=poller.params.fully_connected)

@@ -2,21 +2,21 @@
 
 Allows processing of images with [MMDetection](https://github.com/open-mmlab/mmdetection).
 
-Uses PyTorch 1.5 and CUDA 10.1.
+Uses PyTorch 1.6 and CUDA 10.1.
 
 ## Version
 
 MMDetection github repo tag/hash:
 
 ```
-v2.5.0
-44a7ef2e80f355defb943d02bbee4a011b362a9d
+v2.16.0
+7bd39044f35aec4b90dd797b965777541a8678ff
 ```
 
 and timestamp:
 
 ```
-October 11th, 2020
+August 31st, 2021
 ```
 
 ## Docker
@@ -34,7 +34,7 @@ October 11th, 2020
   ```commandline
   docker run --gpus=all --shm-size 8G \
     -v /local/dir:/container/dir \
-    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-11
+    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0
   ```
 
   **NB:** For docker versions older than 19.03 (`docker version`), use `--runtime=nvidia` instead of `--gpus=all`.
@@ -47,7 +47,7 @@ October 11th, 2020
 
 ### Build local image
 
-* Build the image from Docker file (from within /path_to/mmdetection/2020-10-11)
+* Build the image from Docker file (from within /path_to/mmdetection/2.16.0)
 
   ```commandline
   docker build -t mmdet .
@@ -88,7 +88,7 @@ October 11th, 2020
     ```
 
 * Copy the config file (of the model you want to train) from /mmdetection/configs (inside the container) or 
-  from [here](https://github.com/open-mmlab/mmdetection/tree/b7894cbdcbe114e3e9efdd1a6a229419a552c807/configs) 
+  from [here](https://github.com/open-mmlab/mmdetection/tree/7bd39044f35aec4b90dd797b965777541a8678ff/configs) 
   to local disk, then follow [these instructions](#config).
 
 * Train
@@ -119,21 +119,21 @@ October 11th, 2020
 * Build
 
   ```commandline
-  docker build -t open-mmlab/mmdetection:2020-10-11 .
+  docker build -t open-mmlab/mmdetection:2.16.0 .
   ```
   
 * Tag
 
   ```commandline
   docker tag \
-    mmdetection:2020-10-11 \
-    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-11
+    mmdetection:2.16.0 \
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0
   ```
   
 * Push
 
   ```commandline
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-11
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -146,7 +146,7 @@ October 11th, 2020
   If image is available in aml-repo and you just want to use it, you can pull using following command and then [run](#run).
 
   ```commandline
-  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-11
+  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -157,15 +157,15 @@ October 11th, 2020
   
   ```commandline
   docker tag \
-    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2020-10-11 \
-    open-mmlab/mmdetection:2020-10-11
+    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0 \
+    open-mmlab/mmdetection:2.16.0
   ```
   
 * <a name="run">Run</a>
 
   ```commandline
   docker run --gpus=all --shm-size 8G \
-    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2020-10-11
+    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2.16.0
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 

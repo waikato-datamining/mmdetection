@@ -1,4 +1,4 @@
-ARG PYTORCH="1.5"
+ARG PYTORCH="1.6"
 ARG CUDA="10.1"
 ARG CUDNN="7"
 
@@ -14,13 +14,13 @@ RUN apt-get update && apt-get install -y git ninja-build libglib2.0-0 libsm6 lib
     && rm -rf /var/lib/apt/lists/*
 
 # Install MMCV
-RUN pip install mmcv-full==latest+torch1.5.0+cu101 -f https://openmmlab.oss-accelerate.aliyuncs.com/mmcv/dist/index.html
+RUN pip install mmcv-full==1.3.8 -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6.0/index.html
 
 # Install MMDetection
 RUN conda clean --all && \
     git clone https://github.com/open-mmlab/mmdetection.git /mmdetection && \
     cd /mmdetection && \
-    git checkout tags/v2.5.0
+    git checkout tags/v2.16.0
 WORKDIR /mmdetection
 ENV FORCE_CUDA="1"
 RUN pip install -r requirements/build.txt && \
