@@ -3,4 +3,4 @@
 # Documentation of tools/print_config.py
 # https://mmdetection.readthedocs.io/en/v2.16.0/tutorials/config.html
 
-python /mmdetection/tools/print_config.py "$@"
+python /mmdetection/tools/misc/print_config.py "$@"
