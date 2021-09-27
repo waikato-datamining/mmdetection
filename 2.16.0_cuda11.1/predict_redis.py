@@ -8,6 +8,7 @@ import traceback
 import mmcv
 import pycocotools.mask as maskUtils
 from mmdet.apis import init_detector, inference_detector
+from mmdet.datasets.dataset import determine_classes
 from wai.annotations.image_utils import image_to_numpyarray, remove_alpha_channel, mask_to_polygon, polygon_to_minrect, polygon_to_lists, lists_to_polygon, polygon_to_bbox
 from rdh import Container, MessageContainer, create_parser, configure_redis, run_harness, log
 from opex import ObjectPredictions, ObjectPrediction, Polygon, BBox
@@ -121,7 +122,6 @@ if __name__ == '__main__':
     parser = create_parser('MMDetection - Prediction (Redis)', prog="mmdet_predict_redis", prefix="redis_")
     parser.add_argument('--checkpoint', help='Path to the trained model checkpoint', required=True, default=None)
     parser.add_argument('--config', help='Path to the config file', required=True, default=None)
-    parser.add_argument('--labels', help='Path to text file with comma seperated labels', required=True, default=None)
     parser.add_argument('--score', type=float, help='Score threshold to include in csv file', required=False, default=0.0)
     parser.add_argument('--mask_threshold', type=float, help='The threshold (0-1) to use for determining the contour of a mask', required=False, default=0.1)
     parser.add_argument('--mask_nth', type=int, help='To speed polygon detection up, use every nth row and column only', required=False, default=1)
@@ -143,9 +143,7 @@ if __name__ == '__main__':
         model = init_detector(parsed.config, parsed.checkpoint)
 
         # Get class names
-        with open(parsed.labels, "r") as labels_file:
-            class_names = labels_file.read().strip()
-            class_names = class_names.split(",")
+        class_names = determine_classes()
         if parsed.verbose:
             print("Classes: %s" % str(class_names))
 

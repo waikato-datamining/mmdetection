@@ -9,6 +9,7 @@ import traceback
 import mmcv
 import pycocotools.mask as maskUtils
 from mmdet.apis import init_detector, inference_detector
+from mmdet.datasets.dataset import determine_classes
 from sfp import Poller
 from wai.annotations.image_utils import image_to_numpyarray, remove_alpha_channel, mask_to_polygon, polygon_to_minrect, polygon_to_lists, lists_to_polygon, polygon_to_bbox
 from wai.annotations.core import ImageInfo
@@ -270,7 +271,6 @@ if __name__ == '__main__':
     parser.add_argument('--prediction_in', help='Path to the test images', required=True, default=None)
     parser.add_argument('--prediction_out', help='Path to the output csv files folder', required=True, default=None)
     parser.add_argument('--prediction_tmp', help='Path to the temporary csv files folder', required=False, default=None)
-    parser.add_argument('--labels', help='Path to text file with comma seperated labels', required=True, default=None)
     parser.add_argument('--score', type=float, help='Score threshold to include in csv file', required=False, default=0.0)
     parser.add_argument('--mask_threshold', type=float, help='The threshold (0-1) to use for determining the contour of a mask', required=False, default=0.1)
     parser.add_argument('--mask_nth', type=int, help='To speed polygon detection up, use every nth row and column only', required=False, default=1)
@@ -301,9 +301,7 @@ if __name__ == '__main__':
         model = init_detector(parsed.config, parsed.checkpoint)
         
         # Get class names
-        with open(parsed.labels, "r") as labels_file:
-            class_names = labels_file.read().strip()
-            class_names = class_names.split(",")
+        class_names = determine_classes()
 
         # Performing the prediction and producing the csv files
         predict_on_images(parsed.prediction_in, model, parsed.prediction_out, parsed.prediction_tmp, class_names,
