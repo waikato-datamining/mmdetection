@@ -27,7 +27,6 @@ RUN pip install -r requirements/build.txt && \
     pip install --no-cache-dir python-image-complete "wai.annotations<=0.3.5" "simple-file-poller>=0.0.9" && \
     pip install --no-cache-dir redis "opex==0.0.1" "redis-docker-harness==0.0.1"
 
-ARG blah=002
 RUN ln -s /usr/bin/python3 /usr/bin/python
 COPY bash.bashrc /etc/bash.bashrc
 COPY mmdet_* /usr/bin/
