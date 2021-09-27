@@ -178,7 +178,7 @@ You can output example config files using:
 mmdet_config PATH_TO_CONFIG.py
 ```
 
-You can browse the config files [here](https://github.com/open-mmlab/mmdetection/blob/v2.5.0/docs/model_zoo.md).
+You can browse the config files [here](https://github.com/open-mmlab/mmdetection/blob/v2.16.0/docs/model_zoo.md).
 
 
 ## <a name="config">Preparing the config file</a>
