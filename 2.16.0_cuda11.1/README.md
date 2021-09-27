@@ -34,7 +34,7 @@ August 31st, 2021
   ```commandline
   docker run --gpus=all --shm-size 8G \
     -v /local/dir:/container/dir \
-    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11,1
+    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11.1
   ```
 
   **NB:** For docker versions older than 19.03 (`docker version`), use `--runtime=nvidia` instead of `--gpus=all`.
@@ -47,7 +47,7 @@ August 31st, 2021
 
 ### Build local image
 
-* Build the image from Docker file (from within /path_to/mmdetection/2.16.0_cuda11,1)
+* Build the image from Docker file (from within /path_to/mmdetection/2.16.0_cuda11.1)
 
   ```commandline
   docker build -t mmdet .
@@ -119,21 +119,21 @@ August 31st, 2021
 * Build
 
   ```commandline
-  docker build -t open-mmlab/mmdetection:2.16.0_cuda11,1 .
+  docker build -t open-mmlab/mmdetection:2.16.0_cuda11.1 .
   ```
   
 * Tag
 
   ```commandline
   docker tag \
-    mmdetection:2.16.0_cuda11,1 \
-    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11,1
+    mmdetection:2.16.0_cuda11.1 \
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11.1
   ```
   
 * Push
 
   ```commandline
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11,1
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11.1
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -146,7 +146,7 @@ August 31st, 2021
   If image is available in aml-repo and you just want to use it, you can pull using following command and then [run](#run).
 
   ```commandline
-  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11,1
+  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11.1
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -157,15 +157,15 @@ August 31st, 2021
   
   ```commandline
   docker tag \
-    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11,1 \
-    open-mmlab/mmdetection:2.16.0_cuda11,1
+    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11.1 \
+    open-mmlab/mmdetection:2.16.0_cuda11.1
   ```
   
 * <a name="run">Run</a>
 
   ```commandline
   docker run --gpus=all --shm-size 8G \
-    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2.16.0_cuda11,1
+    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2.16.0_cuda11.1
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
