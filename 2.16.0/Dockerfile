@@ -25,7 +25,8 @@ WORKDIR /mmdetection
 ENV FORCE_CUDA="1"
 RUN pip install -r requirements/build.txt && \
     pip install --no-cache-dir -e . && \
-    pip install --no-cache-dir python-image-complete "wai.annotations<=0.3.5" "simple-file-poller>=0.0.9"
+    pip install --no-cache-dir python-image-complete "wai.annotations<=0.3.5" "simple-file-poller>=0.0.9" && \
+    pip install --no-cache-dir redis "opex==0.0.1" "redis-docker-harness==0.0.1" && \
 
 COPY bash.bashrc /etc/bash.bashrc
 COPY mmdet_* /usr/bin/
@@ -33,4 +34,4 @@ COPY __init__.py /mmdetection/mmdet/datasets
 COPY dataset.py /mmdetection/mmdet/datasets
 COPY train.py /mmdetection/tools
 COPY predict.py /mmdetection/tools
-
+COPY predict_redis.py /mmdetection/tools
