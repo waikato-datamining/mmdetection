@@ -114,6 +114,21 @@ August 31st, 2021
   * `--mask_nth` - use every nth row/col of mask to speed up computation of polygon
   * `--output_minrect`
 
+* Predict via Redis backend
+
+  You need to start the docker container with the `--net=host` option if you are using the host's Redis server.
+
+  The following command listens for images coming through on channel `images` and broadcasts
+  predictions in [opex format](https://github.com/WaikatoLink2020/objdet-predictions-exchange-format):
+
+  ```commandline
+  mmdet_predict_redis --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
+    --redis_in images --redis_out predictions --labels /path_to/your_data/labels.txt --score 0
+  ```
+  
+  Run with `-h` for all available options.
+
+
 ## Pre-built images
 
 * Build
@@ -178,25 +193,26 @@ You can output example config files using:
 mmdet_config PATH_TO_CONFIG.py
 ```
 
-You can browse the config files [here](https://github.com/open-mmlab/mmdetection/blob/v2.16.0/docs/model_zoo.md).
+You can browse the config files and download pre-trained models 
+[here](https://github.com/open-mmlab/mmdetection/blob/v2.16.0/docs/model_zoo.md).
 
 
 ## <a name="config">Preparing the config file</a>
 
-1. If necessary, change `num_classes` to labels + 1 (BG).
+1. If necessary, change `num_classes` to number of labels (background not counted).
 2. In `train_cfg` and `test_cfg`: change `nms_pre`, `nms_post`, and `max_num` to the preferred values.
-3. Change `dataset_type` to `Dataset`
+3. Change `dataset_type` to `Dataset` and any occurrences of `type` in the `train`, `test`, `val` sections of 
+   the `data` dictionary.
 4. Change `data_root` to the root path of your dataset (the directory containing train and val directories).
-5. Copy/paste `train_pipeline = [...]` and rename it to `val_pipeline`.
-6. Change `pipeline` for `val` to `val_pipeline`.
-7. In `train_pipeline`, `val_pipeline` and `test_pipeline`: change `img_scale` to preferred values. 
+5. In `train_pipeline`, `val_pipeline` and `test_pipeline`: change `img_scale` to preferred values. 
    Image will be scaled to the smaller value between (larger_scale/larger_image_side) and (smaller_scale/smaller_image_side).
-8. Adapt `ann_file` and `img_prefix` to suit your dataset.
-9. Interval in `checkpoint_config` will determine the frequency of saving models while training 
+6. Adapt `ann_file` and `img_prefix` to suit your dataset.
+7. Interval in `checkpoint_config` will determine the frequency of saving models while training 
    (10 for example will save a model after every 10 epochs).
-10. Change `total_epochs` to how many epochs you want to train the model for.
-11. Change `work_dir` to the path where you want to save the trained models to.
-12. If you want to include the validation set, add `, ('val', 1)` to `workflow`.
+8. In the `runner` property, change `max_epochs` to how many epochs you want to train the model for.
+9. Change `work_dir` to the path where you want to save the trained models to.
+10. Change `load_from` to the file name of the pre-trained network that you downloaded from the model zoo.
+11. If you want to include the validation set, add `, ('val', 1)` to `workflow`.
 
 _You don't have to copy the config file back, just point at it when training._
 
