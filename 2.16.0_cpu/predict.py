@@ -7,7 +7,6 @@ import torch
 import traceback
 
 import mmcv
-import pycocotools.mask as maskUtils
 from mmdet.apis import init_detector, inference_detector
 from mmdet.datasets.dataset import determine_classes
 from sfp import Poller
@@ -112,7 +111,7 @@ def process_image(fname, output_dir, poller):
                     mask = torch.stack(segms, dim=0).detach().cpu().numpy()
                 else:
                     mask = np.stack(segms, axis=0)
-                mask = maskUtils.decode(mask).astype(np.int)
+                mask = mask[index].astype(bool)
                 poly = mask_to_polygon(mask, poller.params.mask_threshold, mask_nth=poller.params.mask_nth, view=(x0, y0, x1, y1),
                                        view_margin=poller.params.view_margin, fully_connected=poller.params.fully_connected)
                 if len(poly) > 0:

@@ -6,7 +6,6 @@ import torch
 import traceback
 
 import mmcv
-import pycocotools.mask as maskUtils
 from mmdet.apis import init_detector, inference_detector
 from mmdet.datasets.dataset import determine_classes
 from wai.annotations.image_utils import image_to_numpyarray, remove_alpha_channel, mask_to_polygon, polygon_to_minrect, polygon_to_lists, lists_to_polygon, polygon_to_bbox
@@ -71,7 +70,7 @@ def process_image(msg_cont):
                     mask = torch.stack(segms, dim=0).detach().cpu().numpy()
                 else:
                     mask = np.stack(segms, axis=0)
-                mask = maskUtils.decode(mask).astype(np.int)
+                mask = mask[index].astype(bool)
                 poly = mask_to_polygon(mask, config.mask_threshold, mask_nth=config.mask_nth, view=(x0, y0, x1, y1),
                                        view_margin=config.view_margin, fully_connected=config.fully_connected)
                 if len(poly) > 0:
