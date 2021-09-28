@@ -42,6 +42,13 @@ def process_image(msg_cont):
             for i, bbox in enumerate(bbox_result)
         ]
         labels = np.concatenate(labels)
+        masks = None
+        if segm_result is not None:
+            segms = mmcv.concat_list(segm_result)
+            if isinstance(segms[0], torch.Tensor):
+                masks = torch.stack(segms, dim=0).detach().cpu().numpy()
+            else:
+                masks = np.stack(segms, axis=0)
 
         objs = []
         for index in range(len(bboxes)):
@@ -65,12 +72,7 @@ def process_image(msg_cont):
             if segm_result is not None:
                 px = []
                 py = []
-                segms = mmcv.concat_list(segm_result)
-                if isinstance(segms[0], torch.Tensor):
-                    mask = torch.stack(segms, dim=0).detach().cpu().numpy()
-                else:
-                    mask = np.stack(segms, axis=0)
-                mask = mask[index].astype(bool)
+                mask = masks[index].astype(bool)
                 poly = mask_to_polygon(mask, config.mask_threshold, mask_nth=config.mask_nth, view=(x0, y0, x1, y1),
                                        view_margin=config.view_margin, fully_connected=config.fully_connected)
                 if len(poly) > 0:

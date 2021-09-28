@@ -76,6 +76,14 @@ def process_image(fname, output_dir, poller):
         # rois
         roiobjs = []
         mask_comb = None
+        masks = None
+        if segm_result is not None:
+            segms = mmcv.concat_list(segm_result)
+            if isinstance(segms[0], torch.Tensor):
+                masks = torch.stack(segms, dim=0).detach().cpu().numpy()
+            else:
+                masks = np.stack(segms, axis=0)
+
         for index in range(len(bboxes)):
             x0, y0, x1, y1, score = bboxes[index]
             label = labels[index]
@@ -106,12 +114,7 @@ def process_image(fname, output_dir, poller):
                 bw = ""
                 bh = ""
 
-                segms = mmcv.concat_list(segm_result)
-                if isinstance(segms[0], torch.Tensor):
-                    mask = torch.stack(segms, dim=0).detach().cpu().numpy()
-                else:
-                    mask = np.stack(segms, axis=0)
-                mask = mask[index].astype(bool)
+                mask = masks[index].astype(bool)
                 poly = mask_to_polygon(mask, poller.params.mask_threshold, mask_nth=poller.params.mask_nth, view=(x0, y0, x1, y1),
                                        view_margin=poller.params.view_margin, fully_connected=poller.params.fully_connected)
                 if len(poly) > 0:
