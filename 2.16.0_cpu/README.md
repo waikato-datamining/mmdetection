@@ -58,36 +58,16 @@ August 31st, 2021
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
+### Scripts
+
+The following scripts are available:
+
+* `mmdet_config` - for exporting default configurations into separate files
+* `mmdet_predict` - for applying a model to images (uses file-polling)
+* `mmdet_predict_redis` - for applying a model to images (via [Redis](https://redis.io/) backend)
+* `mmdet_onnx` - for exporting a trained PyTorch model to [ONNX](https://onnx.ai/)
+
 ### Usage
-
-* Convert annotations (in ADAMS report format) to MS COCO JSON format using 
-  [wai.annotations](https://github.com/waikato-ufdl/wai-annotations). 
-  Conversion must be done twice, once for training set and again for validation set.
-  
-* Store class names or label strings in an environment variable called `MMDET_CLASSES` **(inside the container)**:
-
-  ```commandline
-  export MMDET_CLASSES=\'class1\',\'class2\',...
-  ```
-  
-* Alternatively, have the labels stored in a text file with the labels separated by commas and the `MMDET_CLASSES`
-  environment variable point at the file.
-  
-  * The labels are stored in `/data/labels.txt` as follows:
-
-    ```commandline
-    class1,class2,...
-    ``` 
-  
-  * Export `MMDET_CLASSES` as follows:
-
-    ```commandline
-    export MMDET_CLASSES=/data/labels.txt
-    ```
-
-* Copy the config file (of the model you want to train) from /mmdetection/configs (inside the container) or 
-  from [here](https://github.com/open-mmlab/mmdetection/tree/7bd39044f35aec4b90dd797b965777541a8678ff/configs) 
-  to local disk, then follow [these instructions](#config).
 
 * Train
 
@@ -191,25 +171,20 @@ You can browse the config files [here](https://github.com/open-mmlab/mmdetection
 
 ## <a name="config">Preparing the config file</a>
 
-1. If necessary, change `num_classes` to labels + 1 (BG).
+1. If necessary, change `num_classes` to number of labels (background not counted).
 2. In `train_cfg` and `test_cfg`: change `nms_pre`, `nms_post`, and `max_num` to the preferred values.
-3. Change `dataset_type` to `Dataset`
+3. Change `dataset_type` to `Dataset` and any occurrences of `type` in the `train`, `test`, `val` sections of 
+   the `data` dictionary.
 4. Change `data_root` to the root path of your dataset (the directory containing train and val directories).
-5. Copy/paste `train_pipeline = [...]` and rename it to `val_pipeline`.
-6. Change `pipeline` for `val` to `val_pipeline`.
-7. In `train_pipeline`, `val_pipeline` and `test_pipeline`: change `img_scale` to preferred values. 
+5. In `train_pipeline`, `val_pipeline` and `test_pipeline`: change `img_scale` to preferred values. 
    Image will be scaled to the smaller value between (larger_scale/larger_image_side) and (smaller_scale/smaller_image_side).
-8. Adapt `ann_file` and `img_prefix` to suit your dataset.
-9. Interval in `checkpoint_config` will determine the frequency of saving models while training 
+6. Adapt `ann_file` and `img_prefix` to suit your dataset.
+7. Interval in `checkpoint_config` will determine the frequency of saving models while training 
    (10 for example will save a model after every 10 epochs).
-10. Change `total_epochs` to how many epochs you want to train the model for.
-11. Change `work_dir` to the path where you want to save the trained models to.
-12. If you want to include the validation set, add `, ('val', 1)` to `workflow`.
-
-_You don't have to copy the config file back, just point at it when training._
-
-**NB:** A fully expanded config file will get placed in the output directory with the same
-name as the config plus the extension *.full*.
+8. In the `runner` property, change `max_epochs` to how many epochs you want to train the model for.
+9. Change `work_dir` to the path where you want to save the trained models to.
+10. Change `load_from` to the file name of the pre-trained network that you downloaded from the model zoo.
+11. If you want to include the validation set, add `, ('val', 1)` to `workflow`.
 
 
 ## Permissions

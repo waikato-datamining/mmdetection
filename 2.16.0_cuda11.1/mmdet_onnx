@@ -1,0 +1,6 @@
+#!/bin/bash
+#
+# Documentation of tools/deployment/pytorch2onnx.py
+# https://mmdetection.readthedocs.io/en/v2.16.0/tutorials/pytorch2onnx.html
+
+python /mmdetection/tools/deployment/pytorch2onnx.py "$@"

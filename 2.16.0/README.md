@@ -60,12 +60,22 @@ August 31st, 2021
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
+### Scripts
+
+The following scripts are available:
+
+* `mmdet_config` - for exporting default configurations into separate files
+* `mmdet_train` - for training a model
+* `mmdet_predict` - for applying a model to images (uses file-polling)
+* `mmdet_predict_redis` - for applying a model to images (via [Redis](https://redis.io/) backend)
+* `mmdet_onnx` - for exporting a trained PyTorch model to [ONNX](https://onnx.ai/)
+
+
 ### Usage
 
-* Convert annotations (in ADAMS report format) to MS COCO JSON format using 
-  [wai.annotations](https://github.com/waikato-ufdl/wai-annotations). 
-  Conversion must be done twice, once for training set and again for validation set.
-  
+* The data must be in COCO format. You can use [wai.annotations](https://github.com/waikato-ufdl/wai-annotations) 
+  to convert your data from other formats.
+
 * Store class names or label strings in an environment variable called `MMDET_CLASSES` **(inside the container)**:
 
   ```commandline
@@ -87,9 +97,8 @@ August 31st, 2021
     export MMDET_CLASSES=/data/labels.txt
     ```
 
-* Copy the config file (of the model you want to train) from /mmdetection/configs (inside the container) or 
-  from [here](https://github.com/open-mmlab/mmdetection/tree/7bd39044f35aec4b90dd797b965777541a8678ff/configs) 
-  to local disk, then follow [these instructions](#config).
+* Use `mmdet_config` to export the config file (of the model you want to train) from `/mmdetection/configs` 
+  (inside the container), then follow [these instructions](#config).
 
 * Train
 
