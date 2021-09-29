@@ -194,10 +194,10 @@ The following scripts are available:
 
 ## Example config files
 
-You can output example config files using:
+You can output example config files using (stored under `/mmdetection/configs` for the various network types):
 
 ```commandline
-mmdet_config PATH_TO_CONFIG.py
+mmdet_config /path/to/my_config.py
 ```
 
 You can browse the config files and download pre-trained models 
