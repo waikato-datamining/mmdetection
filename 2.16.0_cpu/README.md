@@ -76,9 +76,12 @@ The following scripts are available:
 * Predict and produce CSV files
 
   ```commandline
-  mmdet_predict --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
-    --prediction_in /path_to/test_imgs/ --prediction_out /path_to/test_results/ \
-    --score 0
+  mmdet_predict \
+      --checkpoint /path_to/epoch_n.pth \
+      --config /path_to/your_data_config.py \
+      --prediction_in /path_to/test_imgs/ \
+      --prediction_out /path_to/test_results/ \
+      --score 0.0
   ```
   Run with -h for all available options.
 
@@ -96,8 +99,12 @@ The following scripts are available:
   predictions in [opex format](https://github.com/WaikatoLink2020/objdet-predictions-exchange-format):
 
   ```commandline
-  mmdet_predict_redis --checkpoint /path_to/epoch_n.pth --config /path_to/your_data_config.py \
-    --redis_in images --redis_out predictions --score 0
+  mmdet_predict_redis \
+      --checkpoint /path_to/epoch_n.pth \
+      --config /path_to/your_data_config.py \
+      --redis_in images \
+      --redis_out predictions \
+      --score 0.0
   ```
   
   Run with `-h` for all available options.
