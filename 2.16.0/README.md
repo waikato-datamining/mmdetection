@@ -264,3 +264,16 @@ Or specifically for PyTorch:
 
 **NB:** When running the container as root rather than a specific user, the internal directory will have to be
 prefixed with `/root`. 
+
+
+## Troubleshooting
+
+* `PermissionError: [Errno 13] Permission denied: '/mmdetection/work_dirs'`
+
+  Models need pre-trained models to start with and if you do not define `load_from` in the config file,
+  then these will get automatically downloaded to `/mmdetection/work_dirs`. To get rid of this
+  message and avoid unnecessary downloads, simply map the directory to your cache directory:
+  
+  ```commandline
+  -v /somewhere/local/cache:/mmdetection/work_dirs
+  ```
