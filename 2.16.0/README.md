@@ -266,6 +266,12 @@ Or specifically for PyTorch:
 prefixed with `/root`. 
 
 
+## Testing Redis
+
+You can use [simple-redis-helper](https://pypi.org/project/simple-redis-helper/) to broadcast images 
+and listen for image segmentation results when testing.
+
+
 ## Troubleshooting
 
 * `PermissionError: [Errno 13] Permission denied: '/mmdetection/work_dirs'`

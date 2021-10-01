@@ -224,3 +224,9 @@ Or specifically for PyTorch:
 
 **NB:** When running the container as root rather than a specific user, the internal directory will have to be
 prefixed with `/root`. 
+
+
+## Testing Redis
+
+You can use [simple-redis-helper](https://pypi.org/project/simple-redis-helper/) to broadcast images 
+and listen for image segmentation results when testing.
