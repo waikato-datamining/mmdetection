@@ -9,3 +9,4 @@ Available images:
 * [2.16.0](2.16.0) (2021-08-31, does not work on 3xxx series)
 * [2.16.0 (CUDA 11.1)](2.16.0_cuda11.1) (2021-08-31, works on 3xxx series)
 * [2.16.0 (CPU)](2.16.0_cpu) (2021-08-31, inference only)
+* [2.18.1 (CUDA 11.1)](2.18.1_cuda11.1) (2021-11-16, works on 3xxx series)
