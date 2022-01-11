@@ -43,6 +43,14 @@ November 16th, 2021
   docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q) && docker system prune -a
   ```
 
+### Docker hub
+
+The image is also available from [Docker hub](https://hub.docker.com/u/waikatodatamining):
+
+```
+waikatodatamining/mmdetection:2.18.1_cpu
+```
+
 ### Build local image
 
 * Build the image from Docker file (from within /path_to/mmdetection/2.18.1_cpu)
