@@ -150,60 +150,56 @@ The following scripts are available:
   
   Run with `-h` for all available options.
 
-## Pre-built images
 
-* Build
+## Publish images
 
-  ```commandline
-  docker build -t open-mmlab/mmdetection:2.16.0_cuda11.1 .
-  ```
-  
+### Build
+
+```bash
+docker build -t open-mmlab/mmdetection:2.18.1_cuda11.1 .
+```
+
+### Inhouse registry  
+
 * Tag
 
-  ```commandline
+  ```bash
   docker tag \
-    mmdetection:2.16.0_cuda11.1 \
-    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11.1
+    mmdetection:2.18.1_cuda11.1 \
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.18.1_cuda11.1
   ```
   
 * Push
 
-  ```commandline
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11.1
+  ```bash
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.18.1_cuda11.1
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
-  ```commandline
+  ```bash
   docker login public-push.aml-repo.cms.waikato.ac.nz:443
   ```
+
+### Docker hub  
+
+* Tag
+
+  ```bash
+  docker tag \
+    mmdetection:2.18.1_cuda11.1 \
+    waikatodatamining/mmdetection:2.18.1_cuda11.1
+  ```
   
-* Pull
+* Push
 
-  If image is available in aml-repo and you just want to use it, you can pull using following command and then [run](#run).
-
-  ```commandline
-  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11.1
+  ```bash
+  docker push waikatodatamining/mmdetection:2.18.1_cuda11.1
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
-  ```commandline
-  docker login public.aml-repo.cms.waikato.ac.nz:443
+  ```bash
+  docker login 
   ```
-  Then tag by running:
-  
-  ```commandline
-  docker tag \
-    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cuda11.1 \
-    open-mmlab/mmdetection:2.16.0_cuda11.1
-  ```
-  
-* <a name="run">Run</a>
-
-  ```commandline
-  docker run --gpus=all --shm-size 8G \
-    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2.16.0_cuda11.1
-  ```
-  `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
 
 ## Example config files

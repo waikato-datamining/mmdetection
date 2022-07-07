@@ -117,17 +117,20 @@ The following scripts are available:
   
   Run with `-h` for all available options.
 
-## Pre-built images
 
-* Build
+## Publish images
 
-  ```commandline
-  docker build -t open-mmlab/mmdetection:2.16.0_cpu .
-  ```
-  
+### Build
+
+```bash
+docker build -t open-mmlab/mmdetection:2.16.0_cpu .
+```
+
+### Inhouse registry  
+
 * Tag
 
-  ```commandline
+  ```bash
   docker tag \
     mmdetection:2.16.0_cpu \
     public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cpu
@@ -135,42 +138,35 @@ The following scripts are available:
   
 * Push
 
-  ```commandline
+  ```bash
   docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cpu
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
-  ```commandline
+  ```bash
   docker login public-push.aml-repo.cms.waikato.ac.nz:443
   ```
+
+### Docker hub  
+
+* Tag
+
+  ```bash
+  docker tag \
+    mmdetection:2.16.0_cpu \
+    waikatodatamining/mmdetection:2.16.0_cpu
+  ```
   
-* Pull
+* Push
 
-  If image is available in aml-repo and you just want to use it, you can pull using following command and then [run](#run).
-
-  ```commandline
-  docker pull public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cpu
+  ```bash
+  docker push waikatodatamining/mmdetection:2.16.0_cpu
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
-  ```commandline
-  docker login public.aml-repo.cms.waikato.ac.nz:443
+  ```bash
+  docker login 
   ```
-  Then tag by running:
-  
-  ```commandline
-  docker tag \
-    public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.16.0_cpu \
-    open-mmlab/mmdetection:2.16.0_cpu
-  ```
-  
-* <a name="run">Run</a>
-
-  ```commandline
-  docker run --shm-size 8G \
-    -v /local/dir:/container/dir -it open-mmlab/mmdetection:2.16.0_cpu
-  ```
-  `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
 
 ## Example config files
