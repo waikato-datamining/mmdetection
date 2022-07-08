@@ -123,7 +123,7 @@ The following scripts are available:
 ### Build
 
 ```bash
-docker build -t open-mmlab/mmdetection:2.18.1_cpu .
+docker build -t mmdetection:2.18.1_cpu .
 ```
 
 ### Inhouse registry  
