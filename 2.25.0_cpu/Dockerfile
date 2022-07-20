@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir torch==1.9.0+cpu torchvision==0.10.0+cpu torchaud
 ENV TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
 
 # Install MMCV
-RUN pip install mmcv-full==1.3.8 -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.9.0/index.html
+RUN pip install mmcv-full==1.3.17 -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.9.0/index.html
 
 # Install MMDetection
 RUN git clone https://github.com/open-mmlab/mmdetection.git /mmdetection && \
