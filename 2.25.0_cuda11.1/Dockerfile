@@ -30,7 +30,7 @@ RUN git clone https://github.com/open-mmlab/mmdetection.git /mmdetection && \
 WORKDIR /mmdetection
 RUN pip install -r requirements/build.txt && \
     pip install --no-cache-dir -e . && \
-    pip install --no-cache-dir openmim==0.1.6 && \
+    pip install --no-cache-dir openmim==0.2.0 && \
     pip install --no-cache-dir python-image-complete "wai.annotations<=0.3.5" "simple-file-poller>=0.0.9" && \
     pip install --no-cache-dir redis "opex==0.0.1" "redis-docker-harness==0.0.1"
 
