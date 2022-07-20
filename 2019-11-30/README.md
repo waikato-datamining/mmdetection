@@ -133,7 +133,7 @@ Sat Nov 30 04:28:00 2019 +1300
 * Build
 
   ```commandline
-  docker build -t open-mmlab/mmdetection:2019-11-30 .
+  docker build -t mmdetection:2019-11-30 .
   ```
   
 * Tag

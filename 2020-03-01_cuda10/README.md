@@ -135,7 +135,7 @@ March 1st, 2020
 * Build
 
   ```commandline
-  docker build -t open-mmlab/mmdetection:2020-03-01_cuda10 .
+  docker build -t mmdetection:2020-03-01_cuda10 .
   ```
   
 * Tag

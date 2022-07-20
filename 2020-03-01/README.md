@@ -143,7 +143,7 @@ waikatodatamining/mmdetection:2020-03-01
 * Build
 
   ```commandline
-  docker build -t open-mmlab/mmdetection:2020-03-01 .
+  docker build -t mmdetection:2020-03-01 .
   ```
   
 * Tag
