@@ -9,14 +9,14 @@ Uses PyTorch 1.9.0 and CUDA 11.1.
 MMDetection github repo tag/hash:
 
 ```
-v2.25.0
-ca11860f4f3c3ca2ce8340e2686eeaec05b29111
+v2.24.1
+73b4e65a6a30435ef6a35f405e3474a4d9cfb234
 ```
 
 and timestamp:
 
 ```
-June 2nd, 2022
+May 1st, 2022
 ```
 
 ## Docker
@@ -34,7 +34,7 @@ June 2nd, 2022
   ```bash
   docker run --gpus=all --shm-size 8G \
     -v /local/dir:/container/dir \
-    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.25.0_cuda11.1
+    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.24.1_cuda11.1
   ```
 
   **NB:** For docker versions older than 19.03 (`docker version`), use `--runtime=nvidia` instead of `--gpus=all`.
@@ -50,12 +50,12 @@ June 2nd, 2022
 The image is also available from [Docker hub](https://hub.docker.com/u/waikatodatamining):
 
 ```
-waikatodatamining/mmdetection:2.25.0_cuda11.1
+waikatodatamining/mmdetection:2.24.1_cuda11.1
 ```
 
 ### Build local image
 
-* Build the image from Docker file (from within /path_to/mmdetection/2.25.0_cuda11.1)
+* Build the image from Docker file (from within /path_to/mmdetection/2.24.1_cuda11.1)
 
   ```bash
   docker build -t mmdet .
@@ -156,7 +156,7 @@ The following scripts are available:
 ### Build
 
 ```bash
-docker build -t mmdetection:2.25.0_cuda11.1 .
+docker build -t mmdetection:2.24.1_cuda11.1 .
 ```
 
 ### Inhouse registry  
@@ -165,14 +165,14 @@ docker build -t mmdetection:2.25.0_cuda11.1 .
 
   ```bash
   docker tag \
-    mmdetection:2.25.0_cuda11.1 \
-    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.25.0_cuda11.1
+    mmdetection:2.24.1_cuda11.1 \
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.24.1_cuda11.1
   ```
   
 * Push
 
   ```bash
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.25.0_cuda11.1
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.24.1_cuda11.1
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -186,14 +186,14 @@ docker build -t mmdetection:2.25.0_cuda11.1 .
 
   ```bash
   docker tag \
-    mmdetection:2.25.0_cuda11.1 \
-    waikatodatamining/mmdetection:2.25.0_cuda11.1
+    mmdetection:2.24.1_cuda11.1 \
+    waikatodatamining/mmdetection:2.24.1_cuda11.1
   ```
   
 * Push
 
   ```bash
-  docker push waikatodatamining/mmdetection:2.25.0_cuda11.1
+  docker push waikatodatamining/mmdetection:2.24.1_cuda11.1
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -210,7 +210,7 @@ You can output example config files using (stored under `/mmdetection/configs` f
 mmdet_config /path/to/my_config.py
 ```
 
-You can browse the config files [here](https://github.com/open-mmlab/mmdetection/blob/v2.25.0/docs/model_zoo.md).
+You can browse the config files [here](https://github.com/open-mmlab/mmdetection/blob/v2.24.1/docs/model_zoo.md).
 
 
 ## <a name="config">Preparing the config file</a>
