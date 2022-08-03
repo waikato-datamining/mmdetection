@@ -10,7 +10,7 @@ def determine_classes():
     """
     Determines the class labels: reads the MMDET_CLASSES environment variable
     and, if it points to a file, reads the comma-separated labels from there
-    (format: "a,b,c"), otherwise interprets them as string (format: "'a','b','c'")
+    (format: "a,b,c"), otherwise interprets them as string (format: "'a','b','c'" or "a,b,c")
 
     :return: the list of string labels
     :rtype: list
@@ -24,7 +24,12 @@ def determine_classes():
                 class_names = labels_file.read().strip()
                 result = class_names.split(",")
         else:
-            result = eval("(" + os.environ[ENV_VAR] + ")")
+            result = [x.strip() for x in os.environ[ENV_VAR].split(",")]
+            for i in range(len(result)):
+                if result[i].startswith("'") and result[i].endswith("'"):
+                    result[i] = result[i][1:len(result[i])-1]
+                elif result[i].startswith('"') and result[i].endswith('"'):
+                    result[i] = result[i][1:len(result[i]) - 1]
     else:
         raise Exception("Environment variable %s not set!" % ENV_VAR)
     print("Labels determined from %s:" % ENV_VAR, result)
