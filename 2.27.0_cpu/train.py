@@ -36,24 +36,6 @@ def parse_args():
         '--no-validate',
         action='store_true',
         help='whether not to evaluate the checkpoint during training')
-    group_gpus = parser.add_mutually_exclusive_group()
-    group_gpus.add_argument(
-        '--gpus',
-        type=int,
-        help='(Deprecated, please use --gpu-id) number of gpus to use '
-        '(only applicable to non-distributed training)')
-    group_gpus.add_argument(
-        '--gpu-ids',
-        type=int,
-        nargs='+',
-        help='(Deprecated, please use --gpu-id) ids of gpus to use '
-        '(only applicable to non-distributed training)')
-    group_gpus.add_argument(
-        '--gpu-id',
-        type=int,
-        default=0,
-        help='id of gpu to use '
-        '(only applicable to non-distributed training)')
     parser.add_argument('--seed', type=int, default=None, help='random seed')
     parser.add_argument(
         '--diff-seed',
@@ -130,6 +112,12 @@ def main():
                           '"auto_scale_lr.base_batch_size" in your'
                           ' configuration file. Please update all the '
                           'configuration files to mmdet >= 2.24.1.')
+
+    # dummy values
+    args.gpus = None
+    args.gpu_id = 0
+    args.gpu_ids = None
+    args.ipu_replicas = None
 
     # set multi-process settings
     setup_multi_processes(cfg)
