@@ -3,4 +3,5 @@
 # Documentation of tools/deployment/pytorch2onnx.py
 # https://mmdetection.readthedocs.io/en/v2.18.1/tutorials/pytorch2onnx.html
 
+export CUDA_VISIBLE_DEVICES=-1
 python /mmdetection/tools/deployment/pytorch2onnx.py "$@"

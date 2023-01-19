@@ -3,4 +3,5 @@
 # Documentation of tools/train.py
 # https://mmdetection.readthedocs.io/en/v2.18.1/2_new_data_model.html#train-a-new-model
 
+export CUDA_VISIBLE_DEVICES=-1
 python /mmdetection/tools/train.py "$@"
