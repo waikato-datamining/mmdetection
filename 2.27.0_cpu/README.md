@@ -283,3 +283,10 @@ and listen for image segmentation results when testing.
   ```bash
   mmdet_train /path/to/my_config.py --cfg-options work_dir=/some/where/output 
   ```
+
+* `RuntimeError: Expected 4-dimensional input for 4-dimensional weight [64, 3, 7, 7], but got 5-dimensional input of size [1, 2, 3, 800, 800] instead`
+  
+  Though training support on CPU is in principle available, not all operators are supported
+  that your network architecture may require. For more details:
+  
+  https://github.com/open-mmlab/mmdetection/blob/95747b18fc684491a7921deac1c619679ac6d3fb/docs/en/get_started.md
