@@ -71,7 +71,7 @@ waikatodatamining/mmdetection:2.27.0_cpu
 The following scripts are available:
 
 * `mmdet_config` - for exporting default configurations into separate files
-* `mmdet_train` - for training a model
+* `mmdet_train` - for training a model (though not all operators supported)
 * `mmdet_predict` - for applying a model to images (uses file-polling)
 * `mmdet_predict_redis` - for applying a model to images (via [Redis](https://redis.io/) backend)
 * `mmdet_onnx` - for exporting a trained PyTorch model to [ONNX](https://onnx.ai/)
