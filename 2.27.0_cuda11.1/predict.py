@@ -270,6 +270,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--checkpoint', help='Path to the trained model checkpoint', required=True, default=None)
     parser.add_argument('--config', help='Path to the config file', required=True, default=None)
+    parser.add_argument('--device', help='The CUDA device to use', default="cuda:0")
     parser.add_argument('--prediction_in', help='Path to the test images', required=True, default=None)
     parser.add_argument('--prediction_out', help='Path to the output csv files folder', required=True, default=None)
     parser.add_argument('--prediction_tmp', help='Path to the temporary csv files folder', required=False, default=None)
@@ -301,7 +302,7 @@ if __name__ == '__main__':
 
     try:
         # This is the actual model that is used for the object detection
-        model = init_detector(parsed.config, parsed.checkpoint)
+        model = init_detector(parsed.config, parsed.checkpoint, device=parsed.device)
         
         # Get class names
         class_names = determine_classes()
