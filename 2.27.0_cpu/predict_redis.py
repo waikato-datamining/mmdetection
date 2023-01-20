@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
     try:
         # This is the actual model that is used for the object detection
-        model = init_detector(parsed.config, parsed.checkpoint)
+        model = init_detector(parsed.config, parsed.checkpoint, device="cpu")
 
         # Get class names
         class_names = determine_classes()
