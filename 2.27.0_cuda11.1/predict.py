@@ -175,7 +175,7 @@ def process_image(fname, output_dir, poller):
                 opex_pred = ObjectPrediction(score=score, label=label, bbox=bbox, polygon=poly)
                 pred_objs.append(opex_pred)
             else:
-                poller.error("Unknown output format: %s" + poller.params.output_format)
+                poller.error("Unknown output format: %s" % poller.params.output_format)
 
         if poller.params.output_format == OUTPUT_ROIS:
             info = ImageInfo(os.path.basename(fname))
@@ -189,7 +189,7 @@ def process_image(fname, output_dir, poller):
             opex_preds = ObjectPredictions(id=id, timestamp=str(datetime.now()), objects=pred_objs)
             opex_preds.save_json_to_file(output_path)
         else:
-            poller.error("Unknown output format: %s" + poller.params.output_format)
+            poller.error("Unknown output format: %s" % poller.params.output_format)
 
         result.append(output_path)
 
