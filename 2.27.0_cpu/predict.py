@@ -167,6 +167,9 @@ def process_image(fname, output_dir, poller):
                                     minrect_w=bw, minrect_h=bh)
                 pred_objs.append(roi_obj)
             elif poller.params.output_format == OUTPUT_OPEX:
+                if px is None:
+                    px = [x0, x1, x1, x0]
+                    py = [y0, y0, y1, y1]
                 bbox = BBox(left=int(x0), top=int(y0), right=int(x1), bottom=int(y1))
                 points = []
                 for x, y in zip(px, py):
