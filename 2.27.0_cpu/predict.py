@@ -177,7 +177,7 @@ def process_image(fname, output_dir, poller):
             else:
                 poller.error("Unknown output format: %s" % poller.params.output_format)
 
-        if poller.params.output_width_height:
+        if poller.params.output_format == OUTPUT_ROIS:
             info = ImageInfo(os.path.basename(fname))
             roi_ext = (info, pred_objs)
             options = ["--output", output_dir, "--no-images"]
