@@ -168,14 +168,14 @@ def process_image(fname, output_dir, poller):
                 pred_objs.append(roi_obj)
             elif poller.params.output_format == OUTPUT_OPEX:
                 if px is None:
-                    px = [x0, x1, x1, x0]
-                    py = [y0, y0, y1, y1]
+                    px = [int(x0), int(x1), int(x1), int(x0)]
+                    py = [int(y0), int(y0), int(y1), int(y1)]
                 bbox = BBox(left=int(x0), top=int(y0), right=int(x1), bottom=int(y1))
                 points = []
                 for x, y in zip(px, py):
                     points.append((int(x), int(y)))
                 poly = Polygon(points=points)
-                opex_pred = ObjectPrediction(score=score, label=label_str, bbox=bbox, polygon=poly)
+                opex_pred = ObjectPrediction(score=float(score), label=label_str, bbox=bbox, polygon=poly)
                 pred_objs.append(opex_pred)
             else:
                 poller.error("Unknown output format: %s" % poller.params.output_format)
