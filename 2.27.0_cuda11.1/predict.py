@@ -175,7 +175,7 @@ def process_image(fname, output_dir, poller):
                 for x, y in zip(px, py):
                     points.append((int(x), int(y)))
                 poly = Polygon(points=points)
-                opex_pred = ObjectPrediction(score=score, label=label, bbox=bbox, polygon=poly)
+                opex_pred = ObjectPrediction(score=score, label=label_str, bbox=bbox, polygon=poly)
                 pred_objs.append(opex_pred)
             else:
                 poller.error("Unknown output format: %s" % poller.params.output_format)
