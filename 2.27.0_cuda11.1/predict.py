@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import argparse
+from datetime import datetime
 from PIL import Image
 from image_complete import auto
 import torch
@@ -9,6 +10,7 @@ import traceback
 import mmcv
 from mmdet.apis import init_detector, inference_detector
 from mmdet.datasets.dataset import determine_classes
+from opex import ObjectPredictions, ObjectPrediction, BBox, Polygon
 from sfp import Poller
 from wai.annotations.image_utils import image_to_numpyarray, remove_alpha_channel, mask_to_polygon, polygon_to_minrect, polygon_to_lists, lists_to_polygon, polygon_to_bbox
 from wai.annotations.core import ImageInfo
@@ -17,6 +19,10 @@ from wai.annotations.roi.io import ROIWriter
 
 SUPPORTED_EXTS = [".jpg", ".jpeg", ".png", ".bmp"]
 """ supported file extensions (lower case). """
+
+OUTPUT_ROIS = "rois"
+OUTPUT_OPEX = "opex"
+OUTPUT_FORMATS = [OUTPUT_ROIS, OUTPUT_OPEX]
 
 
 def check_image(fname, poller):
@@ -70,11 +76,11 @@ def process_image(fname, output_dir, poller):
         ]
         labels = np.concatenate(labels)
 
-        roi_path = "{}/{}-rois.csv".format(output_dir, os.path.splitext(os.path.basename(fname))[0])
+        output_path = "{}/{}{}".format(output_dir, os.path.splitext(os.path.basename(fname))[0], poller.params.suffix)
         img_path = "{}/{}-mask.png".format(output_dir, os.path.splitext(os.path.basename(fname))[0])
 
-        # rois
-        roiobjs = []
+        # predictions
+        pred_objs = []
         mask_comb = None
         masks = None
         if segm_result is not None:
@@ -152,22 +158,40 @@ def process_image(fname, output_dir, poller):
                     if mask_comb is None:
                         mask_comb = mask_img
                     else:
-                        tmp = np.where(mask_comb==0, mask_img, mask_comb)
+                        tmp = np.where(mask_comb == 0, mask_img, mask_comb)
                         mask_comb = tmp
 
-            roiobj = ROIObject(x0, y0, x1, y1, x0n, y0n, x1n, y1n, label, label_str, score=score,
-                               poly_x=px, poly_y=py, poly_xn=pxn, poly_yn=pyn,
-                               minrect_w=bw, minrect_h=bh)
-            roiobjs.append(roiobj)
+            if poller.params.output_format == OUTPUT_ROIS:
+                roi_obj = ROIObject(x0, y0, x1, y1, x0n, y0n, x1n, y1n, label, label_str, score=score,
+                                    poly_x=px, poly_y=py, poly_xn=pxn, poly_yn=pyn,
+                                    minrect_w=bw, minrect_h=bh)
+                pred_objs.append(roi_obj)
+            elif poller.params.output_format == OUTPUT_OPEX:
+                bbox = BBox(left=int(x0), top=int(y0), right=int(x1), bottom=int(y1))
+                points = []
+                for x, y in zip(px, py):
+                    points.append((int(x), int(y)))
+                poly = Polygon(points=points)
+                opex_pred = ObjectPrediction(score=score, label=label, bbox=bbox, polygon=poly)
+                pred_objs.append(opex_pred)
+            else:
+                poller.error("Unknown output format: %s" + poller.params.output_format)
 
-        info = ImageInfo(os.path.basename(fname))
-        roiext = (info, roiobjs)
-        options = ["--output", output_dir, "--no-images"]
-        if poller.params.output_width_height:
-            options.append("--size-mode")
-        roiwriter = ROIWriter(options)
-        roiwriter.save([roiext])
-        result.append(roi_path)
+        if poller.params.output_format == OUTPUT_ROIS:
+            info = ImageInfo(os.path.basename(fname))
+            roi_ext = (info, pred_objs)
+            options = ["--output", output_dir, "--no-images"]
+            if poller.params.output_width_height:
+                options.append("--size-mode")
+            roi_writer = ROIWriter(options)
+            roi_writer.save([roi_ext])
+        elif poller.params.output_format == OUTPUT_OPEX:
+            opex_preds = ObjectPredictions(id=id, timestamp=str(datetime.now()), objects=pred_objs)
+            opex_preds.save_json_to_file(output_path)
+        else:
+            poller.error("Unknown output format: %s" + poller.params.output_format)
+
+        result.append(output_path)
 
         if mask_comb is not None:
             im = Image.fromarray(np.uint8(mask_comb), 'P')
@@ -182,7 +206,7 @@ def process_image(fname, output_dir, poller):
 
 def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold=0.0,
                       poll_wait=1.0, continuous=False, use_watchdog=False, watchdog_check_interval=10.0,
-                      delete_input=False, mask_threshold=0.1, mask_nth=1,
+                      delete_input=False, mask_threshold=0.1, mask_nth=1, output_format=OUTPUT_ROIS, suffix="-rois.csv",
                       output_minrect=False, view_margin=2, fully_connected='high', fit_bbox_to_polygon=False,
                       output_width_height=False, bbox_as_fallback=-1.0, output_mask_image=False,
                       verbose=False, quiet=False):
@@ -214,6 +238,10 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :type mask_threshold: float
     :param mask_nth: to speed up polygon computation, use only every nth row and column from mask
     :type mask_nth: int
+    :param output_format: the output format to generate (see OUTPUT_FORMATS)
+    :type output_format: str
+    :param suffix: the suffix to use for the prediction files, incl extension
+    :type suffix: str
     :param output_minrect: when predicting polygons, whether to output the minimal rectangles around the objects as well
     :type output_minrect: bool
     :param view_margin: the margin in pixels to use around the masks
@@ -252,6 +280,8 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     poller.continuous = continuous
     poller.use_watchdog = use_watchdog
     poller.watchdog_check_interval = watchdog_check_interval
+    poller.params.output_format = output_format
+    poller.params.suffix = suffix
     poller.params.class_names = class_names
     poller.params.score_threshold = score_threshold
     poller.params.mask_threshold = mask_threshold
@@ -274,6 +304,8 @@ if __name__ == '__main__':
     parser.add_argument('--prediction_in', help='Path to the test images', required=True, default=None)
     parser.add_argument('--prediction_out', help='Path to the output csv files folder', required=True, default=None)
     parser.add_argument('--prediction_tmp', help='Path to the temporary csv files folder', required=False, default=None)
+    parser.add_argument('--prediction_format', choices=OUTPUT_FORMATS, help='The type of output format to generate', default=OUTPUT_ROIS, required=False)
+    parser.add_argument('--prediction_suffix', metavar='SUFFIX', help='The suffix to use for the prediction files', default="-rois.csv", required=False)
     parser.add_argument('--labels', help='ignored, use MMDET_CLASSES environment variable', required=False, default=None)
     parser.add_argument('--score', type=float, help='Score threshold to include in csv file', required=False, default=0.0)
     parser.add_argument('--mask_threshold', type=float, help='The threshold (0-1) to use for determining the contour of a mask', required=False, default=0.1)
@@ -313,6 +345,7 @@ if __name__ == '__main__':
                           use_watchdog=parsed.use_watchdog, watchdog_check_interval=parsed.watchdog_check_interval,
                           delete_input=parsed.delete_input,
                           mask_threshold=parsed.mask_threshold, mask_nth=parsed.mask_nth,
+                          output_format=parsed.prediction_format, suffix=parsed.prediction_suffix,
                           output_minrect=parsed.output_minrect, view_margin=parsed.view_margin,
                           fully_connected=parsed.fully_connected, fit_bbox_to_polygon=parsed.fit_bbox_to_polygon,
                           output_width_height=parsed.output_width_height, bbox_as_fallback=parsed.bbox_as_fallback,
