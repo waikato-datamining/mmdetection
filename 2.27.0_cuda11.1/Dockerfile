@@ -32,7 +32,7 @@ RUN pip install -r requirements/build.txt && \
     pip install --no-cache-dir -e . && \
     pip install --no-cache-dir openmim==0.2.0 && \
     pip install --no-cache-dir python-image-complete "wai.annotations<=0.3.5" "simple-file-poller>=0.0.9" && \
-    pip install --no-cache-dir redis "opex==0.0.1" "redis-docker-harness==0.0.1" && \
+    pip install --no-cache-dir redis "opex==0.0.1" "redis-docker-harness==0.0.2" && \
     pip install --no-cache-dir onnx==1.10.2 onnxruntime-gpu==1.10.0
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
