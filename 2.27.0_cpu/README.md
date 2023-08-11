@@ -19,9 +19,9 @@ and timestamp:
 January 5th, 2023
 ```
 
-## Docker
+## Quick start
 
-### Quick start
+### Inhouse registry
 
 * Log into registry using *public* credentials:
 
@@ -39,11 +39,13 @@ January 5th, 2023
 
 ### Docker hub
 
-The image is also available from [Docker hub](https://hub.docker.com/u/waikatodatamining):
+* Pull and run image (adjust volume mappings `-v`):
 
-```
-waikatodatamining/mmdetection:2.27.0_cpu
-```
+  ```bash
+  docker run --shm-size 8G \
+    -v /local/dir:/container/dir \
+    -it waikatodatamining/mmdetection:2.27.0_cpu
+  ```
 
 ### Build local image
 
@@ -60,7 +62,57 @@ waikatodatamining/mmdetection:2.27.0_cpu
   ```
   `/local/dir:/container/dir` maps a local disk directory into a directory inside the container
 
-### Scripts
+## Publish images
+
+### Build
+
+```bash
+docker build -t mmdetection:2.27.0_cpu .
+```
+
+### Inhouse registry  
+
+* Tag
+
+  ```bash
+  docker tag \
+    mmdetection:2.27.0_cpu \
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.27.0_cpu
+  ```
+  
+* Push
+
+  ```bash
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.27.0_cpu
+  ```
+  If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
+  
+  ```bash
+  docker login public-push.aml-repo.cms.waikato.ac.nz:443
+  ```
+
+### Docker hub  
+
+* Tag
+
+  ```bash
+  docker tag \
+    mmdetection:2.27.0_cpu \
+    waikatodatamining/mmdetection:2.27.0_cpu
+  ```
+  
+* Push
+
+  ```bash
+  docker push waikatodatamining/mmdetection:2.27.0_cpu
+  ```
+  If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
+  
+  ```bash
+  docker login 
+  ```
+
+## Scripts
 
 The following scripts are available:
 
@@ -71,7 +123,7 @@ The following scripts are available:
 * `mmdet_onnx` - for exporting a trained PyTorch model to [ONNX](https://onnx.ai/)
 
 
-### Usage
+## Usage
 
 * The data must be in COCO format. You can use [wai.annotations](https://github.com/waikato-ufdl/wai-annotations) 
   to convert your data from other formats.
@@ -142,56 +194,6 @@ The following scripts are available:
   
   Run with `-h` for all available options.
 
-
-## Publish images
-
-### Build
-
-```bash
-docker build -t mmdetection:2.27.0_cpu .
-```
-
-### Inhouse registry  
-
-* Tag
-
-  ```bash
-  docker tag \
-    mmdetection:2.27.0_cpu \
-    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.27.0_cpu
-  ```
-  
-* Push
-
-  ```bash
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.27.0_cpu
-  ```
-  If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
-  
-  ```bash
-  docker login public-push.aml-repo.cms.waikato.ac.nz:443
-  ```
-
-### Docker hub  
-
-* Tag
-
-  ```bash
-  docker tag \
-    mmdetection:2.27.0_cpu \
-    waikatodatamining/mmdetection:2.27.0_cpu
-  ```
-  
-* Push
-
-  ```bash
-  docker push waikatodatamining/mmdetection:2.27.0_cpu
-  ```
-  If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
-  
-  ```bash
-  docker login 
-  ```
 
 
 ## Example config files
