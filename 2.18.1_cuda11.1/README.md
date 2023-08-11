@@ -37,14 +37,6 @@ November 16th, 2021
     -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:2.18.1_cuda11.1
   ```
 
-  **NB:** For docker versions older than 19.03 (`docker version`), use `--runtime=nvidia` instead of `--gpus=all`.
-
-* If need be, remove all containers and images from your system:
-
-  ```bash
-  docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q) && docker system prune -a
-  ```
-
 ### Docker hub
 
 The image is also available from [Docker hub](https://hub.docker.com/u/waikatodatamining):
