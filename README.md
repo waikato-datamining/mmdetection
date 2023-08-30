@@ -3,19 +3,24 @@ Code and docker images for [Open MMLab's Detection Toolbox](https://github.com/o
 
 Available images:
 
+* 3.1.0 (2023-06-30)
+
+  * [3.1.0 (CUDA 11.3)](3.1.0_cuda11.3)
+  * [3.1.0 (CPU)](3.1.0_cpu) (limited training available)
+
 * 2.27.0 (2023-01-05)
 
-  * [2.27.0 (CUDA 11.1)](2.27.0_cuda11.1) (works on 3xxx series)
+  * [2.27.0 (CUDA 11.1)](2.27.0_cuda11.1)
   * [2.27.0 (CPU)](2.27.0_cpu) (limited training available)
 
 * 2.24.1 (2022-06-02)
 
-  * [2.24.1 (CUDA 11.1)](2.24.1_cuda11.1) (works on 3xxx series)
+  * [2.24.1 (CUDA 11.1)](2.24.1_cuda11.1)
   * [2.24.1 (CPU)](2.24.1_cpu) (inference only)
 
 * 2.18.1 (2021-11-16)
 
-  * [2.18.1 (CUDA 11.1)](2.18.1_cuda11.1) (works on 3xxx series)
+  * [2.18.1 (CUDA 11.1)](2.18.1_cuda11.1)
   * [2.18.1 (CPU)](2.18.1_cpu) (inference only)
     
 * 2.16.0 (2021-08-31)
