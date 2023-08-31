@@ -16,7 +16,7 @@ def determine_classes():
     :rtype: list
     """
 
-    result = None
+    result = []
     if ENV_VAR in os.environ:
         classes = os.environ[ENV_VAR]
         if os.path.exists(classes) and os.path.isfile(classes):
@@ -30,9 +30,9 @@ def determine_classes():
                     result[i] = result[i][1:len(result[i])-1]
                 elif result[i].startswith('"') and result[i].endswith('"'):
                     result[i] = result[i][1:len(result[i]) - 1]
+        print("Labels determined from %s:" % ENV_VAR, result)
     else:
-        raise Exception("Environment variable %s not set!" % ENV_VAR)
-    print("Labels determined from %s:" % ENV_VAR, result)
+        print("WARNING: Environment variable %s not set!" % ENV_VAR)
     return result
 
 
