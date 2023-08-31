@@ -45,6 +45,5 @@ COPY bash.bashrc /etc/bash.bashrc
 COPY mmdet_* /usr/bin/
 COPY __init__.py /mmdetection/mmdet/datasets
 COPY dataset.py /mmdetection/mmdet/datasets
-COPY train.py /mmdetection/tools
 COPY predict.py /mmdetection/tools
 COPY predict_redis.py /mmdetection/tools
