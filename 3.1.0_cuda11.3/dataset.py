@@ -36,7 +36,7 @@ def determine_classes():
     return result
 
 
-@DATASETS.register_module
+@DATASETS.register_module()
 class Dataset(CocoDataset):
 
     CLASSES = determine_classes()
