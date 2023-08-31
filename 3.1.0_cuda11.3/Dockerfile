@@ -1,5 +1,5 @@
-ARG PYTORCH="1.13.1"
-ARG CUDA="11.6"
+ARG PYTORCH="1.12.0"
+ARG CUDA="11.3"
 ARG CUDNN="8"
 
 ARG DOCKER_REGISTRY=public.aml-repo.cms.waikato.ac.nz:443/
@@ -18,7 +18,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install torch
-RUN pip install --no-cache-dir torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 \
+RUN pip install --no-cache-dir torchvision==0.13.0+cu113 torchaudio==0.12.0+cu113 \
     -f https://download.pytorch.org/whl/torch_stable.html
 
 ENV TORCH_CUDA_ARCH_LIST="6.0 6.1 7.0+PTX"
