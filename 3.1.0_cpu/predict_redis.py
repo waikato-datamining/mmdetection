@@ -7,7 +7,7 @@ import traceback
 
 import mmcv
 from mmdet.apis import init_detector, inference_detector
-from mmdet.datasets.dataset import determine_classes
+from mmdet.datasets.ext_dataset import determine_classes
 from wai.annotations.image_utils import image_to_numpyarray, remove_alpha_channel, mask_to_polygon, polygon_to_minrect, polygon_to_lists, lists_to_polygon, polygon_to_bbox
 from rdh import Container, MessageContainer, create_parser, configure_redis, run_harness, log
 from opex import ObjectPredictions, ObjectPrediction, Polygon, BBox
