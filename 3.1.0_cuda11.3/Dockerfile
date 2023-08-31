@@ -44,6 +44,6 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 COPY bash.bashrc /etc/bash.bashrc
 COPY mmdet_* /usr/bin/
 COPY __init__.py /mmdetection/mmdet/datasets
-COPY dataset.py /mmdetection/mmdet/datasets
+COPY ext_dataset.py /mmdetection/mmdet/datasets
 COPY predict.py /mmdetection/tools
 COPY predict_redis.py /mmdetection/tools

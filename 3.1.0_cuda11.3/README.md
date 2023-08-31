@@ -211,7 +211,7 @@ You can browse the config files [here](https://github.com/open-mmlab/mmdetection
 
 1. If necessary, change `num_classes` to number of labels (background not counted).
 2. In `train_cfg` and `test_cfg`: change `nms_pre`, `nms_post`, and `max_num` to the preferred values.
-3. Change `dataset_type` to `Dataset` and any occurrences of `type` in the `train`, `test`, `val` sections of 
+3. Change `dataset_type` to `ExternalDataset` and any occurrences of `type` in the `train`, `test`, `val` sections of 
    the `data` dictionary.
 4. Change `data_root` to the root path of your dataset (the directory containing train and val directories).
 5. In `train_pipeline`, `val_pipeline` and `test_pipeline`: change `img_scale` to preferred values. 

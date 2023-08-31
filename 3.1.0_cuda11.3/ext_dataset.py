@@ -37,6 +37,6 @@ def determine_classes():
 
 
 @DATASETS.register_module()
-class Dataset(CocoDataset):
+class ExternalDataset(CocoDataset):
 
     METAINFO = dict(classes=determine_classes())
