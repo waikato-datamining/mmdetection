@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Documentation of tools/deployment/pytorch2onnx.py
-# https://mmdetection.readthedocs.io/en/v2.18.1/tutorials/pytorch2onnx.html
+# Documentation of tools/torch2onnx.py
+# https://mmdeploy.readthedocs.io/en/stable/02-how-to-run/useful_tools.html
 
-python /mmdetection/tools/deployment/pytorch2onnx.py "$@"
+python /mmdeploy/tools/torch2onnx.py "$@"
