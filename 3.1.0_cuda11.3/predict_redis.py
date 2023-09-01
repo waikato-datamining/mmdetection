@@ -74,8 +74,8 @@ def process_image(msg_cont):
                 py = []
                 poly, _ = bitmap_to_polygon(masks[index])
                 if len(poly) > 0:
-                    px, py = polygon_to_lists(poly[0], swap_x_y=True, normalize=False)
-                    pxn, pyn = polygon_to_lists(poly[0], swap_x_y=True, normalize=True, img_width=image.width, img_height=image.height)
+                    px, py = polygon_to_lists(poly[0], swap_x_y=False, normalize=False)
+                    pxn, pyn = polygon_to_lists(poly[0], swap_x_y=False, normalize=True, img_width=image.width, img_height=image.height)
                     if config.bbox_as_fallback >= 0:
                         if len(px) >= 3:
                             p_x0n, p_y0n, p_x1n, p_y1n = polygon_to_bbox(lists_to_polygon(pxn, pyn))

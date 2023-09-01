@@ -119,8 +119,8 @@ def process_image(fname, output_dir, poller):
 
                 poly, _ = bitmap_to_polygon(masks[index])
                 if len(poly) > 0:
-                    px, py = polygon_to_lists(poly[0], swap_x_y=True, normalize=False)
-                    pxn, pyn = polygon_to_lists(poly[0], swap_x_y=True, normalize=True, img_width=image.width, img_height=image.height)
+                    px, py = polygon_to_lists(poly[0], swap_x_y=False, normalize=False)
+                    pxn, pyn = polygon_to_lists(poly[0], swap_x_y=False, normalize=True, img_width=image.width, img_height=image.height)
                     if poller.params.output_minrect:
                         bw, bh = polygon_to_minrect(poly[0])
                     if poller.params.bbox_as_fallback >= 0:
