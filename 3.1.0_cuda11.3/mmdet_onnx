@@ -1,6 +1,0 @@
-#!/bin/bash
-#
-# Documentation of tools/torch2onnx.py
-# https://mmdeploy.readthedocs.io/en/stable/02-how-to-run/useful_tools.html
-
-python /mmdeploy/tools/torch2onnx.py "$@"

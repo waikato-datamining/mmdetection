@@ -120,7 +120,6 @@ The following scripts are available:
 * `mmdet_train` - for training a model (though not all operators supported)
 * `mmdet_predict` - for applying a model to images (uses file-polling)
 * `mmdet_predict_redis` - for applying a model to images (via [Redis](https://redis.io/) backend)
-* `mmdet_onnx` - for exporting a trained PyTorch model to [ONNX](https://onnx.ai/)
 
 
 ## Usage
@@ -150,7 +149,7 @@ The following scripts are available:
     ```
 
 * Use `mmdet_config` to export the config file (of the model you want to train) from `/mmdetection/configs` 
-  (inside the container), then follow [these instructions](#config).
+  (inside the container).
 
 * Train
 
@@ -201,33 +200,10 @@ The following scripts are available:
 You can output example config files using (stored under `/mmdetection/configs` for the various network types):
 
 ```bash
-mmdet_config /path/to/my_config.py
+mmdet_config /path/from/my_config.py --save-path /path/to/my_saved_config.py
 ```
 
-You can browse the config files [here](https://github.com/open-mmlab/mmdetection/blob/v3.1.0/docs/model_zoo.md).
-
-
-## <a name="config">Preparing the config file</a>
-
-1. If necessary, change `num_classes` to number of labels (background not counted).
-2. In `train_cfg` and `test_cfg`: change `nms_pre`, `nms_post`, and `max_num` to the preferred values.
-3. Change `dataset_type` to `ExternalDataset` and any occurrences of `type` in the `train`, `test`, `val` sections of 
-   the `data` dictionary.
-4. Change `data_root` to the root path of your dataset (the directory containing train and val directories).
-5. In `train_pipeline`, `val_pipeline` and `test_pipeline`: change `img_scale` to preferred values. 
-   Image will be scaled to the smaller value between (larger_scale/larger_image_side) and (smaller_scale/smaller_image_side).
-6. Adapt `ann_file` and `img_prefix` to suit your dataset.
-7. Interval in `checkpoint_config` will determine the frequency of saving models while training 
-   (10 for example will save a model after every 10 epochs).
-8. In the `runner` property, change `max_epochs` to how many epochs you want to train the model for.
-9. Change `work_dir` to the path where you want to save the trained models to.
-10. Change `load_from` to the file name of the pre-trained network that you downloaded from the model zoo.
-11. If you want to include the validation set, add `, ('val', 1)` to `workflow`.
-
-_You don't have to copy the config file back, just point at it when training._
-
-**NB:** A fully expanded config file will get placed in the output directory with the same
-name as the config plus the extension *.full*.
+You can browse the config files [here](https://github.com/open-mmlab/mmdetection/tree/v3.1.0/configs).
 
 
 ## Permissions
@@ -285,4 +261,4 @@ and listen for image segmentation results when testing.
   Though training support on CPU is in principle available, not all operators are supported
   that your network architecture may require. For more details:
   
-  https://github.com/open-mmlab/mmdetection/blob/95747b18fc684491a7921deac1c619679ac6d3fb/docs/en/get_started.md
+  https://github.com/open-mmlab/mmdetection/blob/f78af7785ada87f1ced75a2313746e4ba3149760/docs/en/get_started.md
