@@ -29,6 +29,7 @@ ENV FORCE_CUDA="1"
 RUN pip install mmcv==2.0.1 -f https://download.openmmlab.com/mmcv/dist/cu113/torch1.12/index.html
 
 # Install MMDetection
+ARG MMDEPLOY=1.2.0
 RUN git clone https://github.com/open-mmlab/mmdetection.git /mmdetection && \
     cd /mmdetection && \
     git checkout tags/v3.1.0
@@ -36,10 +37,15 @@ WORKDIR /mmdetection
 RUN pip install --upgrade "setuptools<59" && \
     pip install --no-cache-dir onnx==1.13.1 onnxruntime==1.13.1 && \
     pip install --no-cache-dir -r requirements/build.txt && \
-    pip install --no-cache-dir openmim==0.3.7 mmengine==0.8.2 mmdeploy==1.2.0 && \
+    pip install --no-cache-dir openmim==0.3.7 mmengine==0.8.2 mmdeploy==${MMDEPLOY} && \
     pip install --no-cache-dir -e . && \
     pip install --no-cache-dir python-image-complete "wai.annotations==0.3.5" "simple-file-poller>=0.0.9" && \
     pip install --no-cache-dir redis "opex==0.0.2" "redis-docker-harness==0.0.4"
+
+# get MMDeploy (for deploy tools)
+RUN git clone https://github.com/open-mmlab/mmdeploy.git /mmdeploy && \
+    cd /mmdeploy && \
+    git checkout tags/v${MMDEPLOY}
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 COPY bash.bashrc /etc/bash.bashrc
