@@ -1,4 +1,3 @@
-import numpy as np
 import os
 import argparse
 from datetime import datetime
@@ -7,12 +6,12 @@ from image_complete import auto
 import torch
 import traceback
 
-import mmcv
 from mmdet.apis import init_detector, inference_detector
 from mmdet.datasets.ext_dataset import determine_classes
+from mmdet.structures.mask import BitmapMasks, PolygonMasks, bitmap_to_polygon
 from opex import ObjectPredictions, ObjectPrediction, BBox, Polygon
 from sfp import Poller
-from wai.annotations.image_utils import image_to_numpyarray, remove_alpha_channel, mask_to_polygon, polygon_to_minrect, polygon_to_lists, lists_to_polygon, polygon_to_bbox
+from wai.annotations.image_utils import image_to_numpyarray, remove_alpha_channel, polygon_to_minrect, polygon_to_lists, lists_to_polygon, polygon_to_bbox
 from wai.annotations.core import ImageInfo
 from wai.annotations.roi import ROIObject
 from wai.annotations.roi.io import ROIWriter
@@ -61,43 +60,41 @@ def process_image(fname, output_dir, poller):
         image = remove_alpha_channel(image)
         image_array = image_to_numpyarray(image)
         detection = inference_detector(model, image_array)
+        if 'pred_instances' in detection:
+            pred_instances = detection.pred_instances
+            pred_instances = pred_instances[pred_instances.scores > poller.params.score_threshold]        
+        else:
+            poller.error("No 'pred_instances' in detection data for: %s" % fname)
+            return result
 
         assert isinstance(poller.params.class_names, (tuple, list))
-        if isinstance(detection, tuple):
-            bbox_result, segm_result = detection
-            if isinstance(segm_result, tuple):
-                segm_result = segm_result[0]  # ms rcnn
-        else:
-            bbox_result, segm_result = detection, None
-        bboxes = np.vstack(bbox_result)
-        labels = [
-            np.full(bbox.shape[0], i, dtype=np.int32)
-            for i, bbox in enumerate(bbox_result)
-        ]
-        labels = np.concatenate(labels)
+        labels = pred_instances.labels
+        scores = pred_instances.scores
+        bboxes = None
+        masks = None
+        if 'bboxes' in pred_instances:
+            bboxes = pred_instances.bboxes
+        if 'masks' in pred_instances:
+            masks = pred_instances.masks
+            if isinstance(masks, torch.Tensor):
+                masks = masks.cpu().numpy()
+            elif isinstance(masks, (PolygonMasks, BitmapMasks)):
+                masks = masks.to_ndarray()
+            masks = masks.astype(bool)
 
         output_path = "{}/{}{}".format(output_dir, os.path.splitext(os.path.basename(fname))[0], poller.params.suffix)
-        img_path = "{}/{}-mask.png".format(output_dir, os.path.splitext(os.path.basename(fname))[0])
 
         # predictions
         pred_objs = []
-        mask_comb = None
-        masks = None
-        if segm_result is not None:
-            segms = mmcv.concat_list(segm_result)
-            if isinstance(segms[0], torch.Tensor):
-                masks = torch.stack(segms, dim=0).detach().cpu().numpy()
-            else:
-                masks = np.stack(segms, axis=0)
-
         for index in range(len(bboxes)):
-            x0, y0, x1, y1, score = bboxes[index]
-            label = labels[index]
+            x0, y0, x1, y1 = bboxes[index]
+            x0 = float(x0)
+            y0 = float(y0)
+            x1 = float(x1)
+            y1 = float(y1)
+            score = float(scores[index])
+            label = int(labels[index])
             label_str = poller.params.class_names[label]
-
-            # Ignore this roi if the score is less than the provided threshold
-            if score < poller.params.score_threshold:
-                continue
 
             # Translate roi coordinates into original image coordinates (before combining)
             x0n = x0 / image.width
@@ -112,7 +109,7 @@ def process_image(fname, output_dir, poller):
             bw = None
             bh = None
 
-            if segm_result is not None:
+            if masks is not None:
                 px = []
                 py = []
                 pxn = []
@@ -120,9 +117,7 @@ def process_image(fname, output_dir, poller):
                 bw = ""
                 bh = ""
 
-                mask = masks[index].astype(bool)
-                poly = mask_to_polygon(mask, poller.params.mask_threshold, mask_nth=poller.params.mask_nth, view=(x0, y0, x1, y1),
-                                       view_margin=poller.params.view_margin, fully_connected=poller.params.fully_connected)
+                poly, _ = bitmap_to_polygon(masks[index])
                 if len(poly) > 0:
                     px, py = polygon_to_lists(poly[0], swap_x_y=True, normalize=False)
                     pxn, pyn = polygon_to_lists(poly[0], swap_x_y=True, normalize=True, img_width=image.width, img_height=image.height)
@@ -150,16 +145,6 @@ def process_image(fname, output_dir, poller):
                         if len(px) >= 3:
                             x0, y0, x1, y1 = polygon_to_bbox(lists_to_polygon(px, py))
                             x0n, y0n, x1n, y1n = polygon_to_bbox(lists_to_polygon(pxn, pyn))
-
-                if poller.params.output_mask_image:
-                    mask_img = mask.copy()
-                    mask_img[mask_img < poller.params.mask_threshold] = 0
-                    mask_img[mask_img >= poller.params.mask_threshold] = label+1  # first label is 0
-                    if mask_comb is None:
-                        mask_comb = mask_img
-                    else:
-                        tmp = np.where(mask_comb == 0, mask_img, mask_comb)
-                        mask_comb = tmp
 
             if poller.params.output_format == OUTPUT_ROIS:
                 roi_obj = ROIObject(x0, y0, x1, y1, x0n, y0n, x1n, y1n, label, label_str, score=score,
@@ -196,10 +181,6 @@ def process_image(fname, output_dir, poller):
 
         result.append(output_path)
 
-        if mask_comb is not None:
-            im = Image.fromarray(np.uint8(mask_comb), 'P')
-            im.save(img_path, "PNG")
-            result.append(img_path)
     except KeyboardInterrupt:
         poller.keyboard_interrupt()
     except:
@@ -209,9 +190,9 @@ def process_image(fname, output_dir, poller):
 
 def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold=0.0,
                       poll_wait=1.0, continuous=False, use_watchdog=False, watchdog_check_interval=10.0,
-                      delete_input=False, mask_threshold=0.1, mask_nth=1, output_format=OUTPUT_ROIS, suffix="-rois.csv",
-                      output_minrect=False, view_margin=2, fully_connected='high', fit_bbox_to_polygon=False,
-                      output_width_height=False, bbox_as_fallback=-1.0, output_mask_image=False,
+                      delete_input=False, output_format=OUTPUT_ROIS, suffix="-rois.csv",
+                      output_minrect=False, fit_bbox_to_polygon=False,
+                      output_width_height=False, bbox_as_fallback=-1.0, 
                       verbose=False, quiet=False):
     """
     Method for performing predictions on images.
@@ -237,28 +218,18 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :type watchdog_check_interval: float
     :param delete_input: whether to delete the input images rather than moving them to the output directory
     :type delete_input: bool
-    :param mask_threshold: the threshold to use for determining the contour of a mask
-    :type mask_threshold: float
-    :param mask_nth: to speed up polygon computation, use only every nth row and column from mask
-    :type mask_nth: int
     :param output_format: the output format to generate (see OUTPUT_FORMATS)
     :type output_format: str
     :param suffix: the suffix to use for the prediction files, incl extension
     :type suffix: str
     :param output_minrect: when predicting polygons, whether to output the minimal rectangles around the objects as well
     :type output_minrect: bool
-    :param view_margin: the margin in pixels to use around the masks
-    :type view_margin: int
-    :param fully_connected: whether regions of 'high' or 'low' values should be fully-connected at isthmuses
-    :type fully_connected: str
     :param fit_bbox_to_polygon: whether to fit the bounding box to the polygon
     :type fit_bbox_to_polygon: bool
     :param output_width_height: whether to output x/y/w/h instead of x0/y0/x1/y1
     :type output_width_height: bool
     :param bbox_as_fallback: if ratio between polygon-bbox and bbox is smaller than this value, use bbox as fallback polygon, ignored if < 0
     :type bbox_as_fallback: float
-    :param output_mask_image: when generating masks, whether to output a combined mask image as well
-    :type output_mask_image: bool
     :param verbose: whether to output more logging information
     :type verbose: bool
     :param quiet: whether to suppress output
@@ -287,14 +258,9 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     poller.params.suffix = suffix
     poller.params.class_names = class_names
     poller.params.score_threshold = score_threshold
-    poller.params.mask_threshold = mask_threshold
-    poller.params.mask_nth = mask_nth
-    poller.params.view_margin = view_margin
-    poller.params.fully_connected = fully_connected
     poller.params.output_minrect = output_minrect
     poller.params.bbox_as_fallback = bbox_as_fallback
     poller.params.fit_bbox_to_polygon = fit_bbox_to_polygon
-    poller.params.output_mask_image = output_mask_image
     poller.params.output_width_height = output_width_height
     poller.poll()
 
@@ -310,8 +276,6 @@ if __name__ == '__main__':
     parser.add_argument('--prediction_suffix', metavar='SUFFIX', help='The suffix to use for the prediction files', default="-rois.csv", required=False)
     parser.add_argument('--labels', help='ignored, use MMDET_CLASSES environment variable', required=False, default=None)
     parser.add_argument('--score', type=float, help='Score threshold to include in csv file', required=False, default=0.0)
-    parser.add_argument('--mask_threshold', type=float, help='The threshold (0-1) to use for determining the contour of a mask', required=False, default=0.1)
-    parser.add_argument('--mask_nth', type=int, help='To speed polygon detection up, use every nth row and column only', required=False, default=1)
     parser.add_argument('--output_minrect', action='store_true', help='When outputting polygons whether to store the minimal rectangle around the objects in the CSV files as well', required=False, default=False)
     parser.add_argument('--fit_bbox_to_polygon', action='store_true', help='Whether to fit the bounding box to the polygon', required=False, default=False)
     parser.add_argument('--bbox_as_fallback', default=-1.0, type=float,
@@ -323,10 +287,7 @@ if __name__ == '__main__':
     parser.add_argument('--use_watchdog', action='store_true', help='Whether to react to file creation events rather than performing fixed-interval polling', required=False, default=False)
     parser.add_argument('--watchdog_check_interval', type=float, help='check interval in seconds for the watchdog', required=False, default=10.0)
     parser.add_argument('--delete_input', action='store_true', help='Whether to delete the input images rather than move them to --prediction_out directory', required=False, default=False)
-    parser.add_argument('--view_margin', default=2, type=int, required=False, help='The number of pixels to use as margin around the masks when determining the polygon')
-    parser.add_argument('--fully_connected', default='high', choices=['high', 'low'], required=False, help='When determining polygons, whether regions of high or low values should be fully-connected at isthmuses')
     parser.add_argument('--output_width_height', action='store_true', help="Whether to output x/y/w/h instead of x0/y0/x1/y1 in the ROI CSV files", required=False, default=False)
-    parser.add_argument('--output_mask_image', action='store_true', help="Whether to output a mask image (PNG) when predictions generate masks", required=False, default=False)
     parser.add_argument('--verbose', action='store_true', help='Whether to output more logging info', required=False, default=False)
     parser.add_argument('--quiet', action='store_true', help='Whether to suppress output', required=False, default=False)
     parsed = parser.parse_args()
@@ -346,12 +307,10 @@ if __name__ == '__main__':
                           score_threshold=parsed.score, continuous=parsed.continuous,
                           use_watchdog=parsed.use_watchdog, watchdog_check_interval=parsed.watchdog_check_interval,
                           delete_input=parsed.delete_input,
-                          mask_threshold=parsed.mask_threshold, mask_nth=parsed.mask_nth,
                           output_format=parsed.prediction_format, suffix=parsed.prediction_suffix,
-                          output_minrect=parsed.output_minrect, view_margin=parsed.view_margin,
-                          fully_connected=parsed.fully_connected, fit_bbox_to_polygon=parsed.fit_bbox_to_polygon,
+                          output_minrect=parsed.output_minrect, fit_bbox_to_polygon=parsed.fit_bbox_to_polygon,
                           output_width_height=parsed.output_width_height, bbox_as_fallback=parsed.bbox_as_fallback,
-                          output_mask_image=parsed.output_mask_image, verbose=parsed.verbose, quiet=parsed.quiet)
+                          verbose=parsed.verbose, quiet=parsed.quiet)
 
     except Exception as e:
         print(traceback.format_exc())
