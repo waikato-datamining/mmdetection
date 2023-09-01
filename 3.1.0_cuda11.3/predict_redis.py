@@ -51,7 +51,7 @@ def process_image(msg_cont):
 
         objs = []
         for index in range(len(bboxes)):
-            x0, y0, x1, y1, score = bboxes[index]
+            x0, y0, x1, y1 = bboxes[index]
             x0 = float(x0)
             y0 = float(y0)
             x1 = float(x1)
