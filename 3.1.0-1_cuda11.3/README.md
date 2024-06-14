@@ -34,7 +34,7 @@ June 30th, 2023
   ```bash
   docker run --gpus=all --shm-size 8G \
     -v /local/dir:/container/dir \
-    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:3.1.0_cuda11.3
+    -it public.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:3.1.0-1_cuda11.3
   ```
 
 ### Docker hub
@@ -44,12 +44,12 @@ June 30th, 2023
   ```bash
   docker run --gpus=all --shm-size 8G \
     -v /local/dir:/container/dir \
-    -it waikatodatamining/mmdetection:3.1.0_cuda11.3
+    -it waikatodatamining/mmdetection:3.1.0-1_cuda11.3
   ```
 
 ### Build local image
 
-* Build the image from Docker file (from within /path_to/mmdetection/3.1.0_cuda11.3)
+* Build the image from Docker file (from within /path_to/mmdetection/3.1.0-1_cuda11.3)
 
   ```bash
   docker build -t mmdet .
@@ -67,7 +67,7 @@ June 30th, 2023
 ### Build
 
 ```bash
-docker build -t mmdetection:3.1.0_cuda11.3 .
+docker build -t mmdetection:3.1.0-1_cuda11.3 .
 ```
 
 ### Inhouse registry  
@@ -76,14 +76,14 @@ docker build -t mmdetection:3.1.0_cuda11.3 .
 
   ```bash
   docker tag \
-    mmdetection:3.1.0_cuda11.3 \
-    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:3.1.0_cuda11.3
+    mmdetection:3.1.0-1_cuda11.3 \
+    public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:3.1.0-1_cuda11.3
   ```
   
 * Push
 
   ```bash
-  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:3.1.0_cuda11.3
+  docker push public-push.aml-repo.cms.waikato.ac.nz:443/open-mmlab/mmdetection:3.1.0-1_cuda11.3
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
@@ -97,14 +97,14 @@ docker build -t mmdetection:3.1.0_cuda11.3 .
 
   ```bash
   docker tag \
-    mmdetection:3.1.0_cuda11.3 \
-    waikatodatamining/mmdetection:3.1.0_cuda11.3
+    mmdetection:3.1.0-1_cuda11.3 \
+    waikatodatamining/mmdetection:3.1.0-1_cuda11.3
   ```
   
 * Push
 
   ```bash
-  docker push waikatodatamining/mmdetection:3.1.0_cuda11.3
+  docker push waikatodatamining/mmdetection:3.1.0-1_cuda11.3
   ```
   If error "no basic auth credentials" occurs, then run (enter username/password when prompted):
   
