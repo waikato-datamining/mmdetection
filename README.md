@@ -7,6 +7,8 @@ Available images:
 
   * [3.1.0 (CUDA 11.3)](3.1.0_cuda11.3)
   * [3.1.0 (CPU)](3.1.0_cpu) (limited training available)
+  * [3.1.0-1 (CUDA 11.3, with fast-opex)](3.1.0-1_cuda11.3)
+  * [3.1.0-1 (CPU, with fast-opex)](3.1.0-1_cpu) (limited training available)
 
 * 2.27.0 (2023-01-05)
 
