@@ -163,9 +163,7 @@ def process_image(fname, output_dir, poller):
 def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_threshold=0.0,
                       poll_wait=1.0, continuous=False, use_watchdog=False, watchdog_check_interval=10.0,
                       delete_input=False, output_format=OUTPUT_OPEX, suffix=".json",
-                      fit_bbox_to_polygon=False,
-                      output_width_height=False, bbox_as_fallback=-1.0, 
-                      verbose=False, quiet=False):
+                      fit_bbox_to_polygon=False, bbox_as_fallback=-1.0, verbose=False, quiet=False):
     """
     Method for performing predictions on images.
 
@@ -196,8 +194,6 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     :type suffix: str
     :param fit_bbox_to_polygon: whether to fit the bounding box to the polygon
     :type fit_bbox_to_polygon: bool
-    :param output_width_height: whether to output x/y/w/h instead of x0/y0/x1/y1
-    :type output_width_height: bool
     :param bbox_as_fallback: if ratio between polygon-bbox and bbox is smaller than this value, use bbox as fallback polygon, ignored if < 0
     :type bbox_as_fallback: float
     :param verbose: whether to output more logging information
@@ -230,7 +226,6 @@ def predict_on_images(input_dir, model, output_dir, tmp_dir, class_names, score_
     poller.params.score_threshold = score_threshold
     poller.params.bbox_as_fallback = bbox_as_fallback
     poller.params.fit_bbox_to_polygon = fit_bbox_to_polygon
-    poller.params.output_width_height = output_width_height
     poller.poll()
 
 
@@ -255,7 +250,6 @@ if __name__ == '__main__':
     parser.add_argument('--use_watchdog', action='store_true', help='Whether to react to file creation events rather than performing fixed-interval polling', required=False, default=False)
     parser.add_argument('--watchdog_check_interval', type=float, help='check interval in seconds for the watchdog', required=False, default=10.0)
     parser.add_argument('--delete_input', action='store_true', help='Whether to delete the input images rather than move them to --prediction_out directory', required=False, default=False)
-    parser.add_argument('--output_width_height', action='store_true', help="Whether to output x/y/w/h instead of x0/y0/x1/y1 in the ROI CSV files", required=False, default=False)
     parser.add_argument('--verbose', action='store_true', help='Whether to output more logging info', required=False, default=False)
     parser.add_argument('--quiet', action='store_true', help='Whether to suppress output', required=False, default=False)
     parsed = parser.parse_args()
@@ -276,8 +270,7 @@ if __name__ == '__main__':
                           use_watchdog=parsed.use_watchdog, watchdog_check_interval=parsed.watchdog_check_interval,
                           delete_input=parsed.delete_input,
                           output_format=parsed.prediction_format, suffix=parsed.prediction_suffix,
-                          fit_bbox_to_polygon=parsed.fit_bbox_to_polygon,
-                          output_width_height=parsed.output_width_height, bbox_as_fallback=parsed.bbox_as_fallback,
+                          fit_bbox_to_polygon=parsed.fit_bbox_to_polygon, bbox_as_fallback=parsed.bbox_as_fallback,
                           verbose=parsed.verbose, quiet=parsed.quiet)
 
     except Exception as e:
