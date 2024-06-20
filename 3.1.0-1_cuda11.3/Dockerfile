@@ -39,8 +39,8 @@ RUN pip install --upgrade "setuptools<59" && \
     pip install --no-cache-dir -r requirements/build.txt && \
     pip install --no-cache-dir openmim==0.3.7 mmengine==0.8.2 mmdeploy==${MMDEPLOY} && \
     pip install --no-cache-dir -e . && \
-    pip install --no-cache-dir python-image-complete "wai.annotations==0.3.5" "simple-file-poller>=0.0.9" && \
-    pip install --no-cache-dir redis "fast-opex==0.0.2" orjson "redis-docker-harness==0.0.4"
+    pip install --no-cache-dir python-image-complete "simple-file-poller>=0.0.9" && \
+    pip install --no-cache-dir redis "fast-opex==0.0.2" orjson "redis-docker-harness==0.0.4" "simple-mask-utils==0.0.1"
 
 # get MMDeploy (for deploy tools)
 RUN git clone https://github.com/open-mmlab/mmdeploy.git /mmdeploy && \
@@ -50,7 +50,8 @@ RUN git clone https://github.com/open-mmlab/mmdeploy.git /mmdeploy && \
 RUN ln -s /usr/bin/python3 /usr/bin/python
 COPY bash.bashrc /etc/bash.bashrc
 COPY mmdet_* /usr/bin/
-COPY __init__.py /mmdetection/mmdet/datasets
-COPY ext_dataset.py /mmdetection/mmdet/datasets
-COPY predict.py /mmdetection/tools
-COPY predict_redis.py /mmdetection/tools
+COPY __init__.py /mmdetection/mmdet/datasets/
+COPY ext_dataset.py /mmdetection/mmdet/datasets/
+COPY predict_common.py /mmdetection/tools/
+COPY predict.py /mmdetection/tools/
+COPY predict_redis.py /mmdetection/tools/

@@ -7,9 +7,10 @@ import traceback
 from mmdet.apis import init_detector, inference_detector
 from mmdet.datasets.ext_dataset import determine_classes
 from mmdet.structures.mask import BitmapMasks, PolygonMasks, bitmap_to_polygon
-from wai.annotations.image_utils import image_to_numpyarray, remove_alpha_channel, polygon_to_minrect, polygon_to_lists, lists_to_polygon, polygon_to_bbox
 from rdh import Container, MessageContainer, create_parser, configure_redis, run_harness, log
 from opex import ObjectPredictions, ObjectPrediction, Polygon, BBox
+from smu import polygon_to_lists
+from predict_common import image_to_numpyarray, remove_alpha_channel
 
 
 def process_image(msg_cont):
@@ -78,7 +79,10 @@ def process_image(msg_cont):
                     pxn, pyn = polygon_to_lists(poly[0], swap_x_y=False, normalize=True, img_width=image.width, img_height=image.height)
                     if config.bbox_as_fallback >= 0:
                         if len(px) >= 3:
-                            p_x0n, p_y0n, p_x1n, p_y1n = polygon_to_bbox(lists_to_polygon(pxn, pyn))
+                            p_x0n = min(pxn)
+                            p_y0n = min(pyn)
+                            p_x1n = max(pxn)
+                            p_y1n = max(pyn)
                             p_area = (p_x1n - p_x0n) * (p_y1n - p_y0n)
                             b_area = (x1n - x0n) * (y1n - y0n)
                             if (b_area > 0) and (p_area / b_area < config.bbox_as_fallback):
@@ -89,7 +93,10 @@ def process_image(msg_cont):
                             py = [float(i) for i in [y0, y0, y1, y1]]
                     if config.fit_bbox_to_polygon:
                         if len(px) >= 3:
-                            x0, y0, x1, y1 = polygon_to_bbox(lists_to_polygon(px, py))
+                            x0 = min(px)
+                            y0 = min(py)
+                            x1 = max(px)
+                            y1 = max(py)
 
             bbox = BBox(left=int(x0), top=int(y0), right=int(x1), bottom=int(y1))
             p = []
